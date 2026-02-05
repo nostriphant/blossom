@@ -9,8 +9,8 @@ abstract class FeatureCase extends BaseTestCase
     const SOCKET = '127.0.0.1:8087';
     const RELAY_URL = 'http://' . self::SOCKET;
     const LOG_DIRECTORY = ROOT_DIR . "/logs";
-    const LOG_OUTPUT = self::LOG_DIRECTORY . "/relay.log";
-    const LOG_ERRORS = self::LOG_DIRECTORY . "/relay-errors.log";
+    const LOG_OUTPUT = self::LOG_DIRECTORY . "/blossom.log";
+    const LOG_ERRORS = self::LOG_DIRECTORY . "/blossom-errors.log";
     
     static private $process;
     

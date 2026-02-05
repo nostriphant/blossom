@@ -12,7 +12,8 @@ readonly class Blossom {
 
     public function __invoke(FunctionList $routes) : FunctionList {
         return $routes
-            ->bind(new Endpoint\Blob('HEAD', $this->path))
-            ->bind(new Endpoint\Blob('GET', $this->path));
+            ->bind(new Endpoint\Blob\Options($this->path))
+            ->bind(new Endpoint\Blob\Head($this->path))
+            ->bind(new Endpoint\Blob\Get($this->path));
     }
 }

@@ -39,6 +39,6 @@ switch ($routeInfo[0]) {
         if (isset($response['body'])) {
             print $response['body'];
         }
-        break;
+        exit;
 }
 
