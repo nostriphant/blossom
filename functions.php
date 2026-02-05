@@ -22,10 +22,10 @@ function request(string $method, string $uri, ?string $body = null, array $heade
     curl_close($curl);
 
     $response_headers = explode("\r\n", substr($raw_response, 0, $info['header_size']));
-    list($protocol, $code) = explode(' ', array_shift($response_headers));
+    list($protocol, $status) = explode(' ', array_shift($response_headers));
     $response_body = substr($raw_response, $info['header_size']);
 
-    return [$protocol, $code, array_reduce($response_headers, function(array $carry, string $header) {
+    return [$protocol, $status, array_reduce($response_headers, function(array $carry, string $header) {
         if (empty($header)) {
             return $carry;
         }

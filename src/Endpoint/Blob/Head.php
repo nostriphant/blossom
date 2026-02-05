@@ -20,7 +20,7 @@ readonly class Head implements Endpoint {
                     'Content-Length' => $blob->size
                 ]
             ], 
-            fn() => ['code' => 404]
+            fn() => ['status' => 404]
         ));
     }
 }

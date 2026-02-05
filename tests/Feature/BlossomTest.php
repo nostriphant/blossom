@@ -15,8 +15,8 @@ describe("BUD-01", function() {
     
     it('For preflight (OPTIONS) requests, servers MUST also set, at minimum, the Access-Control-Allow-Headers: Authorization, * and Access-Control-Allow-Methods: GET, HEAD headers.', function () {
         $hash = FeatureCase::writeFile('Hello World!');
-        list($protocol, $code, $headers, $body) = FeatureCase::request('OPTIONS', '/' . $hash);
-        expect($code)->toBe('204');
+        list($protocol, $status, $headers, $body) = FeatureCase::request('OPTIONS', '/' . $hash);
+        expect($status)->toBe('204');
         expect($headers['access-control-allow-origin'])->toBe('Authorization, *');
         expect(explode(', ', $headers['access-control-allow-methods']))->toContain('GET', 'HEAD');
         expect($body)->toBeEmpty();
@@ -24,8 +24,8 @@ describe("BUD-01", function() {
     
     it('GET /<sha-256>', function () {
         $hash = FeatureCase::writeFile('Hello World!');
-        list($protocol, $code, $headers, $body) = FeatureCase::request('GET', '/' . $hash);
-        expect($code)->toBe('200');
+        list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $hash);
+        expect($status)->toBe('200');
         expect($headers['content-type'])->toContain('text/plain');
         expect($headers['access-control-allow-origin'])->toBe('*');
         expect($body)->toBe('Hello World!');
@@ -33,8 +33,8 @@ describe("BUD-01", function() {
 
     it('HEAD /<sha-256>', function () {
         $hash = FeatureCase::writeFile('Hello World!');
-        list($protocol, $code, $headers, $body) = FeatureCase::request('HEAD', '/' . $hash);
-        expect($code)->toBe('200');
+        list($protocol, $status, $headers, $body) = FeatureCase::request('HEAD', '/' . $hash);
+        expect($status)->toBe('200');
         expect($headers['content-type'])->toContain('text/plain');
         expect($headers['access-control-allow-origin'])->toBe('*');
         expect($body)->toBeEmpty();
@@ -42,8 +42,8 @@ describe("BUD-01", function() {
     
 
     it('responds with 404 when file missing', function () {
-        list($protocol, $code, $headers, $body) = FeatureCase::request('GET', '/not-existing');
-        expect($code)->toBe('404');
+        list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/not-existing');
+        expect($status)->toBe('404');
         expect($headers['content-type'])->toContain('text/html');
     });
     

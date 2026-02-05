@@ -21,7 +21,7 @@ readonly class Get implements Endpoint {
                 ],
                 'body' => $blob->contents
             ], 
-            fn() => ['code' => 404]
+            fn() => ['status' => 404]
         ));
     }
 }

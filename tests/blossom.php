@@ -31,7 +31,7 @@ switch ($routeInfo[0]) {
         $handler = $routeInfo[1];
         $response = $handler($routeInfo[2]);
         
-        header('HTTP/2 ' . ($response['code'] ?? '200'), true);
+        header('HTTP/2 ' . ($response['status'] ?? '200'), true);
         
         $headers = $response['headers'] ?? [];
         array_walk($headers, fn(string $value, string $header) => header($header.': ' .$value));
