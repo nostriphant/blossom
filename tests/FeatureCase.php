@@ -52,10 +52,14 @@ abstract class FeatureCase extends BaseTestCase
     }
     
     static function request(string $method, string $path, ?string $body = null, array $headers = []) : array {
-        return Pest::request($method, self::RELAY_URL . $path, $body, $headers);
+        return \nostriphant\Blossom\request($method, self::RELAY_URL . $path, $body, $headers);
     }
     
     static function writeFile(string $content) {
-        return Pest::writeFile(files_directory(), $content);
+        $directory = files_directory();
+        $hash = \nostriphant\Blossom\writeFile($directory, $content);
+        expect($directory . DIRECTORY_SEPARATOR . $hash)->toBeFile();
+        expect(file_get_contents($directory . DIRECTORY_SEPARATOR . $hash))->toBe($content);
+        return $hash;
     }
 }

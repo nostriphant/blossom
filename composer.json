@@ -11,13 +11,13 @@
     "autoload": {
         "psr-4": {
             "nostriphant\\Blossom\\": "src/"
-        }
+        },
+        "files": ["functions.php"]
     },
     "autoload-dev": {
         "psr-4": {
             "nostriphant\\BlossomTests\\": "tests/"
-        },
-        "files": ["tests/Pest.php"]
+        }
     },
     "authors": [
         {
