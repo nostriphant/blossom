@@ -19,17 +19,6 @@ namespace {
 
     pest()->extend(FeatureCase::class)
         ->group('feature')
-        ->in('Feature')
-        ->beforeAll(function() {
-            expect(\nostriphant\BlossomTests\make_files_directory())->toBeTrue();
-            expect(\nostriphant\BlossomTests\files_directory())->toBeDirectory();
-
-            FeatureCase::relay_process();
-        })
-        ->afterAll(function() {
-            FeatureCase::end_relay_process();
-
-            \nostriphant\RelayTests\destroy_files_directory();
-        });
+        ->in('Feature');
 
 }
