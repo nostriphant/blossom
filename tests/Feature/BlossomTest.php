@@ -2,34 +2,43 @@
 
 namespace nostriphant\BlossomTests\Feature;
 
+use \nostriphant\BlossomTests\FeatureCase;
+
 beforeAll(function() {
     expect(\nostriphant\BlossomTests\make_files_directory())->toBeTrue();
     expect(\nostriphant\BlossomTests\files_directory())->toBeDirectory();
 
-    \nostriphant\BlossomTests\FeatureCase::relay_process();
+    FeatureCase::relay_process();
 });
 
 describe("BUD-01", function() {
     it('GET /<sha-256>', function () {
-        $hash = $this->writeFile('Hello World!');
-        $body = $this->expectRelayResponse('/' . $hash, 200, 'text/plain');
+        $hash = FeatureCase::writeFile('Hello World!');
+        list($protocol, $code, $headers, $body) = FeatureCase::request('GET', '/' . $hash);
+        expect($code)->toBe('200');
+        expect($headers['content-type'])->toContain('text/plain');
         expect($body)->toBe('Hello World!');
     });
 
     it('HEAD /<sha-256>', function () {
-        $hash = $this->writeFile('Hello World!');
-        $body = $this->expectRelayResponse('/' . $hash, 200, 'text/plain', 'HEAD');
+        $hash = FeatureCase::writeFile('Hello World!');
+        list($protocol, $code, $headers, $body) = FeatureCase::request('HEAD', '/' . $hash);
+        expect($code)->toBe('200');
+        expect($headers['content-type'])->toContain('text/plain');
         expect($body)->toBeEmpty();
     });
+    
 
     it('responds with 404 when file missing', function () {
-        $body = $this->expectRelayResponse('/not-existing', 404, 'text/html');
+        list($protocol, $code, $headers, $body) = FeatureCase::request('GET', '/not-existing');
+        expect($code)->toBe('404');
+        expect($headers['content-type'])->toContain('text/html');
     });
     
 });
 
 afterAll(function() {
-    \nostriphant\BlossomTests\FeatureCase::end_relay_process();
+    FeatureCase::end_relay_process();
 
     \nostriphant\RelayTests\destroy_files_directory();
 });

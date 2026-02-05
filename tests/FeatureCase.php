@@ -51,22 +51,40 @@ abstract class FeatureCase extends BaseTestCase
         unlink(self::LOG_OUTPUT);
     }
     
-    public function expectRelayResponse(string $path, int $code, string $content_type, string $method = 'GET', array $headers = []) {
+    static function request(string $method, string $path, ?string $body = null, array $headers = []) : array {
         $curl = curl_init(self::RELAY_URL . $path);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HEADER, true);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
-        curl_setopt($curl, CURLOPT_NOBODY, $method === 'HEAD');
+        switch ($method) {
+            case 'HEAD':
+                curl_setopt($curl, CURLOPT_NOBODY, true);
+                break;
+            default:
+                break;
+                
+        }
+        
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        $body = curl_exec($curl);
+        $raw_response = curl_exec($curl);
         $info = curl_getinfo($curl);
         curl_close($curl);
-        expect($info['http_code'])->toBe($code);
-        expect($info['content_type'])->toContain($content_type);
-
-        return $body;
+        
+        $response_headers = explode("\r\n", substr($raw_response, 0, $info['header_size']));
+        list($protocol, $code) = explode(' ', array_shift($response_headers));
+        $response_body = substr($raw_response, $info['header_size']);
+        
+        return [$protocol, $code, array_reduce($response_headers, function(array $carry, string $header) {
+            if (empty($header)) {
+                return $carry;
+            }
+            list($name, $value) = explode(":", $header, 2);
+            $carry[strtolower($name)] = trim($value, " ");
+            return $carry;
+        } , []), $response_body];
     }
     
-    public function writeFile(string $content) {
+    static function writeFile(string $content) {
         $hash = hash('sha256', $content);
         file_put_contents(files_directory() . DIRECTORY_SEPARATOR . $hash, $content);
         expect(files_directory() . DIRECTORY_SEPARATOR . $hash)->toBeFile();
