@@ -13,13 +13,21 @@ beforeAll(function() {
 
 describe("BUD-01", function() {
     
-    it('For preflight (OPTIONS) requests, servers MUST also set, at minimum, the Access-Control-Allow-Headers: Authorization, * and Access-Control-Allow-Methods: GET, HEAD headers.', function () {
-        $hash = FeatureCase::writeFile('Hello World!');
-        list($protocol, $status, $headers, $body) = FeatureCase::request('OPTIONS', '/' . $hash);
-        expect($status)->toBe('204');
-        expect($headers['access-control-allow-origin'])->toBe('Authorization, *');
-        expect(explode(', ', $headers['access-control-allow-methods']))->toContain('GET', 'HEAD');
-        expect($body)->toBeEmpty();
+    describe("Preflight", function() {
+        it('For preflight (OPTIONS) requests, servers MUST also set, at minimum, the Access-Control-Allow-Headers: Authorization, * and Access-Control-Allow-Methods: GET, HEAD headers.', function () {
+            $hash = FeatureCase::writeFile('Hello World!');
+            list($protocol, $status, $headers, $body) = FeatureCase::request('OPTIONS', '/' . $hash);
+            expect($status)->toBe('204');
+            expect($headers['access-control-allow-origin'])->toBe('Authorization, *');
+            expect(explode(', ', $headers['access-control-allow-methods']))->toContain('GET', 'HEAD');
+            expect($body)->toBeEmpty();
+        });
+
+        it('The header Access-Control-Max-Age: 86400 MAY be set to cache the results of a preflight request for 24 hours.', function () {
+            $hash = FeatureCase::writeFile('Hello World!');
+            list($protocol, $status, $headers, $body) = FeatureCase::request('OPTIONS', '/' . $hash);
+            expect($headers['access-control-max-age'])->toBe('86400');
+        });
     });
     
     it('GET /<sha-256>', function () {

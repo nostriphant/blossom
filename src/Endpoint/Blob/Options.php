@@ -17,7 +17,8 @@ readonly class Options implements Endpoint {
                 'status' => '204',
                 'headers' => [
                     'Access-Control-Allow-Origin' => 'Authorization, *',
-                    'Access-Control-Allow-Methods' => 'GET, HEAD'
+                    'Access-Control-Allow-Methods' => 'GET, HEAD',
+                    'Access-Control-Max-Age' => 86400
                 ]
             ], 
             fn() => ['status' => 404]
