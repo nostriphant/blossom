@@ -17,6 +17,7 @@ describe("BUD-01", function() {
         list($protocol, $code, $headers, $body) = FeatureCase::request('GET', '/' . $hash);
         expect($code)->toBe('200');
         expect($headers['content-type'])->toContain('text/plain');
+        expect($headers['access-control-allow-origin'])->toBe('*');
         expect($body)->toBe('Hello World!');
     });
 
@@ -25,6 +26,7 @@ describe("BUD-01", function() {
         list($protocol, $code, $headers, $body) = FeatureCase::request('HEAD', '/' . $hash);
         expect($code)->toBe('200');
         expect($headers['content-type'])->toContain('text/plain');
+        expect($headers['access-control-allow-origin'])->toBe('*');
         expect($body)->toBeEmpty();
     });
     
@@ -39,6 +41,5 @@ describe("BUD-01", function() {
 
 afterAll(function() {
     FeatureCase::end_relay_process();
-
     \nostriphant\RelayTests\destroy_files_directory();
 });

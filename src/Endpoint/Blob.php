@@ -17,6 +17,7 @@ readonly class Blob implements Endpoint {
                 $response = [
                     'headers' => [
                         'Content-Type' => $blob->type,
+                        'Access-Control-Allow-Origin' => '*',
                         'Content-Length' => $blob->size
                     ]
                 ];
