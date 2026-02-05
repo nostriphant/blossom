@@ -10,9 +10,14 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "nostriphant\\Blossom\\": "src/",
-            "nostriphant\\BlossomTests\\": "tests/"
+            "nostriphant\\Blossom\\": "src/"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "nostriphant\\BlossomTests\\": "tests/"
+        },
+        "files": ["tests/Pest.php"]
     },
     "authors": [
         {
