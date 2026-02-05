@@ -1,0 +1,33 @@
+{
+    "name": "nostriphant/blossom",
+    "description": "Blossom implementation in PHP",
+    "homepage" : "https://github.com/nostriphant/blossom",
+    "require": {
+        "php": "^8.4",
+        "nostriphant/functional": "^2.3"
+    },
+    
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "nostriphant\\Blossom\\": "src/",
+            "nostriphant\\BlossomTests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Rik Meijer",
+            "email": "nostriphant@rikmeijer.nl"
+        }
+    ],
+    "require-dev": {
+        "ext-curl": "*",
+        "pestphp/pest": "^4.0",
+        "nikic/fast-route": "^1.3"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
