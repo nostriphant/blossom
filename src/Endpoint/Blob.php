@@ -11,13 +11,12 @@ readonly class Blob implements Endpoint {
     }
     
     private function blob(string $hash) : \nostriphant\Blossom\Blob {
-        return new \nostriphant\Blossom\Blob($this->path . DIRECTORY_SEPARATOR . $hash);
+        return new \nostriphant\Blossom\Blob($this->path . DIRECTORY_SEPARATOR . $hash, fn() => ['status' => 404]);
     }
     
     #[\Override]
     public function __invoke(callable $define) : void {
-        $define('OPTIONS', '/{hash:\w+}[.{ext:\w+}]', fn(array $attributes) => (new Blob\Options($this->blob($attributes['hash'])))());
-        
-        $define('GET', '/{hash:\w+}[.{ext:\w+}]', fn(array $attributes) => (new Blob\Get($this->blob($attributes['hash'])))());
+        $define('OPTIONS', '/{hash:\w+}[.{ext:\w+}]', fn(array $attributes) => $this->blob($attributes['hash'])(new Blob\Options()));
+        $define('GET', '/{hash:\w+}[.{ext:\w+}]', fn(array $attributes) => $this->blob($attributes['hash'])(new Blob\Get()));
     }
 }

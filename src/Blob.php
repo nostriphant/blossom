@@ -5,8 +5,10 @@ namespace nostriphant\Blossom;
 
 final readonly class Blob {
     
-    public function __construct(public string $path) {
-        
+    private \Closure $missing;
+    
+    public function __construct(public string $path, callable $missing) {
+        $this->missing = \Closure::fromCallable($missing);
     }
 
     public function __get(string $name): mixed {
@@ -17,10 +19,10 @@ final readonly class Blob {
         };
     }
     
-    public function __invoke(callable $exists, callable $missing): mixed {
+    public function __invoke(callable $exists): mixed {
         return match (file_exists($this->path)) {
             true => $exists($this),
-            false => $missing($this)
+            false => ($this->missing)($this)
         };
     }
     
