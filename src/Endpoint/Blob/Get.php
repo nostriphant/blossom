@@ -13,8 +13,8 @@ readonly class Get {
         return ($this->blob)(
             fn(\nostriphant\Blossom\Blob $blob) =>  [
                 'headers' => [
+                    'Access-Control-Allow-Origin' => '*',   
                     'Content-Type' => $blob->type,
-                    'Access-Control-Allow-Origin' => '*',
                     'Content-Length' => $blob->size
                 ],
                 'body' => $blob->contents
