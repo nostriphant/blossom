@@ -39,6 +39,15 @@ describe("BUD-01", function() {
         expect($body)->toBe('Hello World!');
     });
 
+    it('GET /<sha-256>.txt', function () {
+        $hash = FeatureCase::writeFile('Hello World!');
+        list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $hash . '.txt');
+        expect($status)->toBe('200');
+        expect($headers['content-type'])->toContain('text/plain');
+        expect($headers['access-control-allow-origin'])->toBe('*');
+        expect($body)->toBe('Hello World!');
+    });
+    
     it('HEAD /<sha-256>', function () {
         $hash = FeatureCase::writeFile('Hello World!');
         list($protocol, $status, $headers, $body) = FeatureCase::request('HEAD', '/' . $hash);
@@ -48,6 +57,14 @@ describe("BUD-01", function() {
         expect($body)->toBeEmpty();
     });
     
+    it('HEAD /<sha-256>.txt', function () {
+        $hash = FeatureCase::writeFile('Hello World!');
+        list($protocol, $status, $headers, $body) = FeatureCase::request('HEAD', '/' . $hash . '.txt');
+        expect($status)->toBe('200');
+        expect($headers['content-type'])->toContain('text/plain');
+        expect($headers['access-control-allow-origin'])->toBe('*');
+        expect($body)->toBeEmpty();
+    });
 
     it('responds with 404 when file missing', function () {
         list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/not-existing');

@@ -12,7 +12,7 @@ readonly class Get implements Endpoint {
     
     #[\Override]
     public function __invoke(callable $define) : void {
-        $define('GET', '/{hash:\w+}', fn(array $attributes) => (new \nostriphant\Blossom\Blob($this->path . DIRECTORY_SEPARATOR . $attributes['hash']))(
+        $define('GET', '/{hash:\w+}[.{ext:\w+}]', fn(array $attributes) => (new \nostriphant\Blossom\Blob($this->path . DIRECTORY_SEPARATOR . $attributes['hash']))(
             fn(\nostriphant\Blossom\Blob $blob) =>  [
                 'headers' => [
                     'Content-Type' => $blob->type,
