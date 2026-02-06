@@ -2,17 +2,15 @@
 
 namespace nostriphant\Blossom\Endpoint\Blob;
 
-use nostriphant\Blossom\Endpoint;
 
-readonly class Get implements Endpoint {
+readonly class Get {
     
-    public function __construct(private string $path) {
+    public function __construct(private \nostriphant\Blossom\Blob $blob) {
 
     }
     
-    #[\Override]
-    public function __invoke(callable $define) : void {
-        $define('GET', '/{hash:\w+}[.{ext:\w+}]', fn(array $attributes) => (new \nostriphant\Blossom\Blob($this->path . DIRECTORY_SEPARATOR . $attributes['hash']))(
+    public function __invoke() : array {
+        return ($this->blob)(
             fn(\nostriphant\Blossom\Blob $blob) =>  [
                 'headers' => [
                     'Content-Type' => $blob->type,
@@ -22,6 +20,6 @@ readonly class Get implements Endpoint {
                 'body' => $blob->contents
             ], 
             fn() => ['status' => 404]
-        ));
+        );
     }
 }

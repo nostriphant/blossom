@@ -2,17 +2,14 @@
 
 namespace nostriphant\Blossom\Endpoint\Blob;
 
-use nostriphant\Blossom\Endpoint;
-
-readonly class Options implements Endpoint {
+readonly class Options {
     
-    public function __construct(private string $path) {
+    public function __construct(private \nostriphant\Blossom\Blob $blob) {
 
     }
     
-    #[\Override]
-    public function __invoke(callable $define) : void {
-        $define('OPTIONS', '/{hash:\w+}', fn(array $attributes) => (new \nostriphant\Blossom\Blob($this->path . DIRECTORY_SEPARATOR . $attributes['hash']))(
+    public function __invoke() : array {
+        return ($this->blob)(
             fn(\nostriphant\Blossom\Blob $blob) => [
                 'status' => '204',
                 'headers' => [
@@ -22,6 +19,6 @@ readonly class Options implements Endpoint {
                 ]
             ], 
             fn() => ['status' => 404]
-        ));
+        );
     }
 }
