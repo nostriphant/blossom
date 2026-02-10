@@ -8,7 +8,7 @@ readonly class Factory {
     }
     
     public function __invoke(callable $exists) : \nostriphant\Blossom\Blob {
-        return new \nostriphant\Blossom\Blob($this->path, $exists, $this->missing);
+        return new \nostriphant\Blossom\Blob($this->path, 'file_exists' , $exists, $this->missing);
     }
     
 }
