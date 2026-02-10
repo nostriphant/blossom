@@ -3,12 +3,14 @@ namespace nostriphant\Blossom\Blob;
 
 readonly class Factory {
     
-    public function __construct(private string $path, private \Closure $missing) {
+    private \Closure $when_factory;
+    
+    public function __construct(string $path, callable $missing) {
+        $this->when_factory = fn(callable $exists) => fn(string $hash) => new \nostriphant\Blossom\When('file_exists', fn(string $blob_path) => $exists(new \nostriphant\Blossom\Blob($blob_path)), $missing)($path . DIRECTORY_SEPARATOR . $hash);
     }
     
     public function __invoke(callable $exists) : callable {
-        $when = new \nostriphant\Blossom\When('file_exists', fn(string $path) => $exists(new \nostriphant\Blossom\Blob($path)), $this->missing);
-        return fn(string $hash) => $when($this->path . DIRECTORY_SEPARATOR . $hash);
+        return ($this->when_factory)($exists);
     }
     
 }
