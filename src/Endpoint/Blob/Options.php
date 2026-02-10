@@ -8,7 +8,7 @@ readonly class Options {
         $define('OPTIONS', $this);
     }
     
-    public function __invoke(callable $blob) : array {
+    public function __invoke(\nostriphant\Blossom\Blob $blob) : array {
         return [
             'status' => '204',
             'headers' => [
