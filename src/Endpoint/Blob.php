@@ -10,13 +10,9 @@ readonly class Blob implements Endpoint {
 
     }
     
-    static function blob(string $path, callable $exists) : callable {
-        return fn(array $attributes) => (new \nostriphant\Blossom\Blob($path . DIRECTORY_SEPARATOR . $attributes['hash'], $exists, fn() => ['status' => 404]))();
-    }
-    
     #[\Override]
     public function __invoke(callable $define) : void {
-        $redefine = fn(string $method, callable $exists) => $define($method, '/{hash:\w+}[.{ext:\w+}]', self::blob($this->path, $exists));
+        $redefine = fn(string $method, callable $exists) => $define($method, '/{hash:\w+}[.{ext:\w+}]', fn(array $attributes) => (new \nostriphant\Blossom\Blob($this->path . DIRECTORY_SEPARATOR . $attributes['hash'], $exists, fn() => ['status' => 404]))());
         new Blob\Options($redefine);
         new Blob\Get($redefine);
     }
