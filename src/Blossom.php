@@ -6,7 +6,7 @@ use \nostriphant\Functional\FunctionList;
 
 readonly class Blossom {
     
-    public function __construct(private \Closure $blob_factory) {
+    public function __construct(private Blob\Factory $blob_factory) {
        
     }
 
