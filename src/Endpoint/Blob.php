@@ -6,13 +6,13 @@ use nostriphant\Blossom\Endpoint;
 
 readonly class Blob implements Endpoint {
     
-    public function __construct(private string $path) {
+    public function __construct(private \Closure $blob_factory) {
 
     }
     
     #[\Override]
     public function __invoke(callable $define) : void {
-        $redefine = fn(string $method, callable $exists) => $define($method, '/{hash:\w+}[.{ext:\w+}]', fn(array $attributes) => (new \nostriphant\Blossom\Blob($this->path . DIRECTORY_SEPARATOR . $attributes['hash'], $exists, fn() => ['status' => 404]))());
+        $redefine = fn(string $method, callable $exists) => $define($method, '/{hash:\w+}[.{ext:\w+}]', fn(array $attributes) => ($this->blob_factory)($attributes['hash'], $exists));
         new Blob\Options($redefine);
         new Blob\Get($redefine);
     }

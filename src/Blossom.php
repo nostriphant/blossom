@@ -11,7 +11,10 @@ readonly class Blossom {
     }
 
     public function __invoke(FunctionList $routes) : FunctionList {
+        
+        $blob_factory = fn(string $hash, callable $exists) => (new \nostriphant\Blossom\Blob($this->path . DIRECTORY_SEPARATOR . $hash, $exists, fn() => ['status' => 404]))();
+        
         return $routes
-            ->bind(new Endpoint\Blob($this->path));
+            ->bind(new Endpoint\Blob($blob_factory));
     }
 }
