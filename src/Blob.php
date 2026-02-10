@@ -12,20 +12,17 @@ final readonly class Blob {
         $this->missing = \Closure::fromCallable($missing);
         $this->exists = \Closure::fromCallable($exists);
     }
-
-    public function __get(string $name): mixed {
-        return match($name) {
-            'type' => 'text/plain',
-            'size' => filesize($this->path),
-            'contents' => file_get_contents($this->path),
-            default => null
-        };
-    }
     
-    public function __invoke(): mixed {
-        return match (file_exists($this->path)) {
-            true => ($this->exists)($this),
-            false => ($this->missing)($this)
+    public function __invoke(string $hash): mixed {
+        $path =  $this->path . DIRECTORY_SEPARATOR . $hash;
+        return match (file_exists($path)) {
+            true => ($this->exists)(fn(string $name) => match($name) {
+                'type' => 'text/plain',
+                'size' => filesize($path),
+                'contents' => file_get_contents($path),
+                default => null
+            }),
+            false => ($this->missing)()
         };
     }
     

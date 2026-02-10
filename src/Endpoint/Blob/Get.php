@@ -9,14 +9,14 @@ readonly class Get {
         $define('GET', $this);
     }
     
-    public function __invoke(\nostriphant\Blossom\Blob $blob) : array {
+    public function __invoke(callable $blob) : array {
         return [
             'headers' => [
                 'Access-Control-Allow-Origin' => '*',   
-                'Content-Type' => $blob->type,
-                'Content-Length' => $blob->size
+                'Content-Type' => $blob('type'),
+                'Content-Length' => $blob('size')
             ],
-            'body' => $blob->contents
+            'body' => $blob('contents')
         ];
     }
 }
