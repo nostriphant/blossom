@@ -4,12 +4,11 @@ namespace nostriphant\Blossom\Blob;
 readonly class Factory {
     
     public function __construct(private string $path, private \Closure $missing) {
-        
     }
     
-    public function __invoke(string $hash, callable $exists) : \nostriphant\Blossom\When {
-        $path = $this->path . DIRECTORY_SEPARATOR . $hash;
-        return new \nostriphant\Blossom\When(fn() => file_exists($path), fn() => $exists(new \nostriphant\Blossom\Blob($path)), fn() => ($this->missing)($path));
+    public function __invoke(callable $exists) : callable {
+        $when = new \nostriphant\Blossom\When('file_exists', fn(string $path) => $exists(new \nostriphant\Blossom\Blob($path)), $this->missing);
+        return fn(string $hash) => $when($this->path . DIRECTORY_SEPARATOR . $hash);
     }
     
 }
