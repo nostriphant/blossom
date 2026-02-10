@@ -5,7 +5,7 @@ namespace nostriphant\Blossom;
 
 readonly class Blob {
     public function __construct(private string $path) {
-        ;
+        
     }
     
     public function __get(string $name): mixed {

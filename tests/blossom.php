@@ -5,8 +5,9 @@ require_once __DIR__ . '/bootstrap.php';
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $blob_factory = new \nostriphant\Blossom\Blob\Factory(nostriphant\Blossom\data_directory() . '/files', fn() => ['status' => 404]);
     $blossom = new \nostriphant\Blossom\Blossom($blob_factory);
-    $routes = $blossom(new \nostriphant\Functional\FunctionList());
-    $routes(fn(string $method, string $path, callable $endpoint) => $r->addRoute($method, $path, $endpoint));
+    
+    $routes = $blossom();
+    iterator_apply($routes, fn(Iterator $iterator) => $iterator->current()(fn(string $method, string $path, callable $endpoint) => $r->addRoute($method, $path, $endpoint)), [$routes]);
 });
 
 // Fetch method and URI from somewhere

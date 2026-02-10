@@ -10,9 +10,7 @@ readonly class Blossom {
        
     }
 
-    public function __invoke(FunctionList $routes) : FunctionList {
-        
-        return $routes
-            ->bind(new Endpoint\Blob($this->blob_factory));
+    public function __invoke() : \Generator {
+        yield new Endpoint\Blob($this->blob_factory);
     }
 }
