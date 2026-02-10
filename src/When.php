@@ -16,10 +16,10 @@ final readonly class When {
     }
     
     public function __invoke(): mixed {
-        return match (($this->test)($this->path)) {
-            true => ($this->exists)(new Blob($this->path)),
-            false => ($this->missing)()
-        };
+        return (match (($this->test)($this->path)) {
+            true => ($this->exists),
+            false => ($this->missing)
+        })($this->path);
     }
     
 }
