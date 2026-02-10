@@ -8,7 +8,8 @@ readonly class Factory {
     }
     
     public function __invoke(string $hash, callable $exists) : \nostriphant\Blossom\When {
-        return new \nostriphant\Blossom\When('file_exists' , $this->path . DIRECTORY_SEPARATOR . $hash, fn(string $path) => $exists(new \nostriphant\Blossom\Blob($path)), $this->missing);
+        $path = $this->path . DIRECTORY_SEPARATOR . $hash;
+        return new \nostriphant\Blossom\When(fn() => file_exists($path), fn() => $exists(new \nostriphant\Blossom\Blob($path)), fn() => ($this->missing)($path));
     }
     
 }
