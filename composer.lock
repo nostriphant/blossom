@@ -8,20 +8,20 @@
     "packages": [
         {
             "name": "nostriphant/functional",
-            "version": "2.4.0",
+            "version": "2.5.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/functional.git",
-                "reference": "bb53fffe5976ddb2802d519bc54dcd0dfba68113"
+                "reference": "c5ea3cd4624e9c6399fda29a1f5c2d071567ae1a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/functional/zipball/bb53fffe5976ddb2802d519bc54dcd0dfba68113",
-                "reference": "bb53fffe5976ddb2802d519bc54dcd0dfba68113",
+                "url": "https://api.github.com/repos/nostriphant/functional/zipball/c5ea3cd4624e9c6399fda29a1f5c2d071567ae1a",
+                "reference": "c5ea3cd4624e9c6399fda29a1f5c2d071567ae1a",
                 "shasum": ""
             },
             "require": {
-                "php": "^8.3"
+                "php": "^8.4"
             },
             "require-dev": {
                 "pestphp/pest": "^2.35"
@@ -40,15 +40,15 @@
             "authors": [
                 {
                     "name": "Rik Meijer",
-                    "email": "rik@nostriphant.dev"
+                    "email": "nostriphant@rikmeijer.nl"
                 }
             ],
             "description": "Functional helper classes for nostriphant projects",
             "support": {
                 "issues": "https://github.com/nostriphant/functional/issues",
-                "source": "https://github.com/nostriphant/functional/tree/2.4.0"
+                "source": "https://github.com/nostriphant/functional/tree/2.5.5"
             },
-            "time": "2026-02-10T10:26:51+00:00"
+            "time": "2026-02-11T10:23:47+00:00"
         }
     ],
     "packages-dev": [

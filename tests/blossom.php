@@ -7,7 +7,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $blossom = new \nostriphant\Blossom\Blossom($blob_factory);
     
     $routes = $blossom();
-    iterator_apply($routes, fn(Iterator $iterator) => $iterator->current()(fn(string $method, string $path, callable $endpoint) => $r->addRoute($method, $path, $endpoint)), [$routes]);
+    nostriphant\Functional\Functions::iterator_walk($routes, fn(callable $route) => $route(fn(string $method, string $path, callable $endpoint) => $r->addRoute($method, $path, $endpoint)));
 });
 
 // Fetch method and URI from somewhere
