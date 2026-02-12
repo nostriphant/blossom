@@ -3,7 +3,7 @@
 require_once __DIR__ . '/bootstrap.php';
 
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
-    $blob_factory = new \nostriphant\Blossom\Blob\Factory(nostriphant\Blossom\data_directory() . '/files', fn() => ['status' => 404]);
+    $blob_factory = new \nostriphant\Blossom\Blob\Factory(nostriphant\Blossom\data_directory() . '/files');
     $blossom = new \nostriphant\Blossom\Blossom($blob_factory);
     
     $routes = $blossom();
@@ -31,13 +31,19 @@ switch ($routeInfo[0]) {
         break;
     case FastRoute\Dispatcher::FOUND:
         $handler = $routeInfo[1];
-        $response = $handler($routeInfo[2]);
+        $response = $handler($routeInfo[2], function() {
+            $handle = fopen('php://input', 'rb');
+            while (feof($handle) === false) {
+                yield fread($handle, 1024);
+            }
+            fclose($handle);
+        });
         
         header('HTTP/2 ' . ($response['status'] ?? '200'), true);
         
         $headers = $response['headers'] ?? [];
         array_walk($headers, fn(string $value, string $header) => header($header.': ' .$value));
-
+        
         if (isset($response['body'])) {
             print $response['body'];
         }

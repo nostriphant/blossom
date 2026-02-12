@@ -51,8 +51,8 @@ abstract class FeatureCase extends BaseTestCase
         unlink(self::LOG_OUTPUT);
     }
     
-    static function request(string $method, string $path, ?string $body = null, array $headers = []) : array {
-        return \nostriphant\Blossom\request($method, self::RELAY_URL . $path, $body, $headers);
+    static function request(string $method, string $path, $upload_resource = null, array $headers = []) : array {
+        return \nostriphant\Blossom\request($method, self::RELAY_URL . $path, $upload_resource, $headers);
     }
     
     static function writeFile(string $content) {

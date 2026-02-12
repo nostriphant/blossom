@@ -83,6 +83,31 @@ describe("BUD-01", function() {
     
 });
 
+
+describe("BUD-02", function() {
+    
+    it('PUT /upload', function () {
+        
+        $resource = tmpfile();
+        fwrite($resource, 'Hello World!!!');
+        fseek($resource, 0);
+        
+        list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', '/upload', upload_resource: $resource);
+        expect($status)->toBe('201');
+        
+        $expected_hash = hash('sha256', 'Hello World!!!');
+        $blob_descriptor = json_decode($body);
+        expect($blob_descriptor->url)->toBe(FeatureCase::RELAY_URL . '/' . $expected_hash);
+        expect($blob_descriptor->sha256)->toBe($expected_hash);
+        expect($blob_descriptor->size)->toBe(14);
+        expect($blob_descriptor->type)->toBe('text/plain');
+        expect($blob_descriptor->uploaded)->toBeInt();
+        
+        
+        expect($headers['content-location'])->toBe('/' . $expected_hash);
+    });
+});
+
 afterAll(function() {
     FeatureCase::end_relay_process();
     \nostriphant\RelayTests\destroy_files_directory();

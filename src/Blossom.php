@@ -11,6 +11,7 @@ readonly class Blossom {
     }
 
     public function __invoke() : \Generator {
+        yield new Endpoint\Upload($this->blob_factory);
         yield new Endpoint\Blob($this->blob_factory);
     }
 }

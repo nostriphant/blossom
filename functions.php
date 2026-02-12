@@ -2,7 +2,7 @@
 
 namespace nostriphant\Blossom;
 
-function request(string $method, string $uri, ?string $body = null, array $headers = []) : array {
+function request(string $method, string $uri, $upload_resource = null, array $headers = []) : array {
     $curl = curl_init($uri);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_HEADER, true);
@@ -10,6 +10,11 @@ function request(string $method, string $uri, ?string $body = null, array $heade
     switch ($method) {
         case 'HEAD':
             curl_setopt($curl, CURLOPT_NOBODY, true);
+            break;
+        case 'PUT':
+            curl_setopt($curl, CURLOPT_UPLOAD, 1);
+            curl_setopt($curl, CURLOPT_READDATA, $upload_resource);
+            curl_setopt($curl, CURLOPT_READFUNCTION, fn($ch, $fh, int $length) => fread($fh, $length));
             break;
         default:
             break;
