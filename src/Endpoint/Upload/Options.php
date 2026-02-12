@@ -3,7 +3,7 @@
 namespace nostriphant\Blossom\Endpoint\Upload;
 
 readonly class Options {
-    public function __invoke(\nostriphant\Blossom\Blob\Uncreated $blob) : array {
+    public function __invoke() : array {
         return [
             'status' => '204',
             'headers' => [

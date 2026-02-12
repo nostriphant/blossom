@@ -4,14 +4,19 @@ namespace nostriphant\Blossom\Endpoint\Upload;
 
 
 readonly class Put {
-    public function __invoke(\nostriphant\Blossom\Blob\Uncreated $blob, callable $stream) : array {
-        $new_blob = $blob($stream);
+    
+    private \nostriphant\Blossom\Blob $blob;
+    
+    public function __construct(\nostriphant\Blossom\Blob\Uncreated $blob, callable $stream) {
+        $this->blob = $blob($stream);
+    }
+    public function __invoke() : array {
         $content = json_encode([
-                "url" => $new_blob->url,
-                "sha256" => $new_blob->sha256,
-                "size" => $new_blob->size,
-                "type" => $new_blob->type,
-                "uploaded" => $new_blob->uploaded
+                "url" => $this->blob->url,
+                "sha256" => $this->blob->sha256,
+                "size" => $this->blob->size,
+                "type" => $this->blob->type,
+                "uploaded" => $this->blob->uploaded
             ]);
         
         return [
@@ -20,7 +25,7 @@ readonly class Put {
                 'Access-Control-Allow-Origin' => '*',   
                 'Content-Type' => 'application/json',
                 'Content-Length' => strlen($content),
-                'Content-Location' => '/' . $new_blob->sha256
+                'Content-Location' => '/' . $this->blob->sha256
             ],
             'body' => $content
         ];
