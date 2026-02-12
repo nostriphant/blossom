@@ -5,10 +5,13 @@ namespace nostriphant\Blossom\Endpoint\Upload;
 
 readonly class Put {
     
-    public function __construct(private \nostriphant\Blossom\Blob\Uncreated $blob) {
+    private \Closure $stream;
+    
+    public function __construct(private \nostriphant\Blossom\Blob\Uncreated $blob, callable $stream) {
+        $this->stream = \Closure::fromCallable($stream);
     }
-    public function __invoke(callable $stream) : array {
-        $blob = ($this->blob)($stream);
+    public function __invoke() : array {
+        $blob = ($this->blob)($this->stream);
         
         $content = json_encode([
                 "url" => $blob->url,
