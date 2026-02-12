@@ -10,7 +10,7 @@ readonly class Upload {
     }
     
     public function __invoke(callable $define) : void {
-        $define('OPTIONS', fn(array $attributes, callable $stream) => new Upload\Options()());
-        $define('PUT', fn(array $attributes, callable $stream) => (new Upload\Put(new \nostriphant\Blossom\Blob\Uncreated($this->path), $stream))());
+        $define('OPTIONS', fn(array $attributes, callable $stream) => new Upload\Options());
+        $define('PUT', fn(array $attributes, callable $stream) => new Upload\Put(new \nostriphant\Blossom\Blob\Uncreated($this->path), $stream));
     }
 }

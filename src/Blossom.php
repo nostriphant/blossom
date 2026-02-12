@@ -11,7 +11,7 @@ readonly class Blossom {
     }
     
     static function wrap(string $endpoint, callable $endpoint_factory) : callable {
-        return fn(callable $define) => $endpoint_factory(fn(string $method, callable $handler) => $define($method, $endpoint, $handler));
+        return fn(callable $define) => $endpoint_factory(fn(string $method, callable $handler) => $define($method, $endpoint, fn(array $attributes, callable $stream) => $handler($attributes, $stream)()));
     }
 
     public function __invoke() : \Generator {
