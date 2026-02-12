@@ -3,12 +3,11 @@
 namespace nostriphant\Blossom\Blob;
 
 
-class Uncreated implements Creatable {
+class Uncreated {
     public function __construct(private string $path) {
         
     }
     
-    #[\Override]
     public function __invoke(callable $stream): \nostriphant\Blossom\Blob {
         $temp = tempnam($this->path, "buffer.");
         

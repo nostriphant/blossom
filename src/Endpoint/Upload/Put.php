@@ -9,12 +9,7 @@ readonly class Put {
         $define('PUT', $this);
     }
     
-    public function __invoke(\nostriphant\Blossom\Blob\Creatable|\nostriphant\Blossom\Blob $blob, callable $stream) : array {
-        if ($blob instanceof \nostriphant\Blossom\Blob) {
-            return ['status' => 409];
-        }
-        
-        
+    public function __invoke(\nostriphant\Blossom\Blob\Uncreated $blob, callable $stream) : array {
         $new_blob = $blob($stream);
         $content = json_encode([
                 "url" => $new_blob->url,
