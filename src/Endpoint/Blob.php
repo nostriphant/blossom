@@ -15,8 +15,8 @@ readonly class Blob {
     }
     
     public function __invoke(callable $define) : void {
-        $redefine = fn(string $method, callable $handler) => $define($method, fn(array $attributes) => $handler($attributes['hash']));
-        $redefine('OPTIONS', ($this->blob_factory)(new Blob\Options()));
-        $redefine('GET', ($this->blob_factory)(new Blob\Get()));
+        $wrap = fn(callable $handler) => fn(array $attributes) => $handler($attributes['hash']);
+        $define('OPTIONS', $wrap(($this->blob_factory)(new Blob\Options())));
+        $define('GET', $wrap(($this->blob_factory)(new Blob\Get())));
     }
 }
