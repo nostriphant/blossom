@@ -5,7 +5,7 @@ namespace nostriphant\Blossom\Endpoint\Upload;
 readonly class Options {
     
     public function __construct(callable $define) {
-        $define('OPTIONS', $this, $this);
+        $define('OPTIONS', $this);
     }
     
     public function __invoke(\nostriphant\Blossom\Blob\Creatable $blob) : array {

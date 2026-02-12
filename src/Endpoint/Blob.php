@@ -12,7 +12,7 @@ readonly class Blob implements Endpoint {
     
     #[\Override]
     public function __invoke(callable $define) : void {
-        $redefine = fn(string $method, callable $exists) => $define($method, '/{hash:\w+}[.{ext:\w+}]', fn(array $attributes) => ($this->blob_factory)($exists, fn() => ['status' => 404])($attributes['hash']));
+        $redefine = fn(string $method, callable $handler) => $define($method, '/{hash:\w+}[.{ext:\w+}]', fn(array $attributes) => ($this->blob_factory)($handler, fn() => ['status' => 404])($attributes['hash']));
         new Blob\Options($redefine);
         new Blob\Get($redefine);
     }

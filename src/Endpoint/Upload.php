@@ -12,7 +12,7 @@ readonly class Upload implements Endpoint {
     
     #[\Override]
     public function __invoke(callable $define) : void {
-        $redefine = fn(string $method, callable $exists, callable $missing) => $define($method, '/upload', fn(array $attributes, callable $stream) => ($this->blob_factory)(fn(\nostriphant\Blossom\Blob\Creatable $blob) => $exists($blob, $stream), fn(\nostriphant\Blossom\Blob\Creatable $blob) => $missing($blob, $stream))());
+        $redefine = fn(string $method, callable $handler) => $define($method, '/upload', fn(array $attributes, callable $stream) => ($this->blob_factory)(fn(\nostriphant\Blossom\Blob\Creatable $blob) => $handler($blob, $stream), fn(\nostriphant\Blossom\Blob\Creatable $blob) => $handler($blob, $stream))());
         new Upload\Options($redefine);
         new Upload\Put($redefine);
     }
