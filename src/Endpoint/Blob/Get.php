@@ -4,14 +4,15 @@ namespace nostriphant\Blossom\Endpoint\Blob;
 
 
 readonly class Get {
-    public function __invoke(\nostriphant\Blossom\Blob $blob) : array {
+    public function __construct(private \nostriphant\Blossom\Blob $blob) {}
+    public function __invoke() : array {
         return [
             'headers' => [
                 'Access-Control-Allow-Origin' => '*',   
-                'Content-Type' => $blob->type,
-                'Content-Length' => $blob->size
+                'Content-Type' => $this->blob->type,
+                'Content-Length' => $this->blob->size
             ],
-            'body' => $blob->contents
+            'body' => $this->blob->contents
         ];
     }
 }
