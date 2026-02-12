@@ -5,6 +5,7 @@ namespace nostriphant\Blossom;
 
 readonly class Blob {
     
+    public bool $exists;
     public string $sha256;
     public string $type;
     public int $size;
@@ -12,6 +13,7 @@ readonly class Blob {
     public int $uploaded;
     
     public function __construct(private string $path) {
+        $this->exists = file_exists($path);
         $this->sha256 = basename($path);
         $this->type = 'text/plain';
         $this->size = filesize($this->path);
