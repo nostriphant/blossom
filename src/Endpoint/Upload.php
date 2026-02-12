@@ -6,13 +6,13 @@ use nostriphant\Blossom\Endpoint;
 
 readonly class Upload implements Endpoint {
     
-    public function __construct(private \nostriphant\Blossom\Blob\Factory $blob_factory) {
+    public function __construct(private string $path) {
 
     }
     
     #[\Override]
     public function __invoke(callable $define) : void {
-        $redefine = fn(string $method, callable $handler) => $define($method, '/upload', fn(array $attributes, callable $stream) => ($this->blob_factory)(fn(\nostriphant\Blossom\Blob\Creatable $blob) => $handler($blob, $stream), fn(\nostriphant\Blossom\Blob\Creatable $blob) => $handler($blob, $stream))());
+        $redefine = fn(string $method, callable $handler) => $define($method, '/upload', fn(array $attributes, callable $stream) => $handler(new \nostriphant\Blossom\Blob\Uncreated($this->path), $stream));
         new Upload\Options($redefine);
         new Upload\Put($redefine);
     }

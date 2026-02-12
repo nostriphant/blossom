@@ -6,8 +6,17 @@ use nostriphant\Blossom\Endpoint;
 
 readonly class Blob implements Endpoint {
     
-    public function __construct(private \nostriphant\Blossom\Blob\Factory $blob_factory) {
-
+    private \Closure $blob_factory;
+    
+    public function __construct(string $path) {
+        $blob_existing = fn(callable $exists) => fn(string $blob_path) => $exists(new \nostriphant\Blossom\Blob($blob_path));
+        $blob_missing = fn(callable $missing) => fn(string $blob_path) => $missing(new \nostriphant\Blossom\Blob\Missing($blob_path));
+        
+        $this->blob_factory = fn(callable $exists, callable $missing) => fn(string $hash) => new \nostriphant\Functional\When(
+                                'file_exists', 
+                                $blob_existing($exists), 
+                                $blob_missing($missing)
+                        )($path . DIRECTORY_SEPARATOR . $hash);
     }
     
     #[\Override]
