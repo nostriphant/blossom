@@ -2,9 +2,7 @@
 
 namespace nostriphant\Blossom\Endpoint;
 
-use nostriphant\Blossom\Endpoint;
-
-readonly class Blob implements Endpoint {
+readonly class Blob {
     
     private \Closure $blob_factory;
     
@@ -16,7 +14,6 @@ readonly class Blob implements Endpoint {
                         )($path . DIRECTORY_SEPARATOR . $hash);
     }
     
-    #[\Override]
     public function __invoke(callable $define) : void {
         $redefine = fn(string $method, callable $handler) => $define($method, '/{hash:\w+}[.{ext:\w+}]', fn(array $attributes) => ($this->blob_factory)($handler, $attributes['hash']));
         $redefine('OPTIONS', new Blob\Options());
