@@ -13,7 +13,6 @@ class Uncreated {
         
         $handle = fopen($temp, 'wb');
         foreach ($stream() as $buffer) {
-            error_log('DATA: ' . $buffer);
             fwrite($handle, $buffer);
         }
         fclose($handle);
