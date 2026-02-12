@@ -13,7 +13,7 @@ readonly class Upload implements Endpoint {
     #[\Override]
     public function __invoke(callable $define) : void {
         $redefine = fn(string $method, callable $handler) => $define($method, '/upload', fn(array $attributes, callable $stream) => $handler(new \nostriphant\Blossom\Blob\Uncreated($this->path), $stream));
-        new Upload\Options($redefine);
-        new Upload\Put($redefine);
+        $redefine('OPTIONS', new Upload\Options());
+        $redefine('PUT', new Upload\Put());
     }
 }

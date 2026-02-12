@@ -4,11 +4,6 @@ namespace nostriphant\Blossom\Endpoint\Upload;
 
 
 readonly class Put {
-    
-    public function __construct(callable $define) {
-        $define('PUT', $this);
-    }
-    
     public function __invoke(\nostriphant\Blossom\Blob\Uncreated $blob, callable $stream) : array {
         $new_blob = $blob($stream);
         $content = json_encode([

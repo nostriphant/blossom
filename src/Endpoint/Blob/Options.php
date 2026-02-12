@@ -3,11 +3,6 @@
 namespace nostriphant\Blossom\Endpoint\Blob;
 
 readonly class Options {
-    
-    public function __construct(callable $define) {
-        $define('OPTIONS', $this);
-    }
-    
     public function __invoke(\nostriphant\Blossom\Blob $blob) : array {
         return [
             'status' => '204',
