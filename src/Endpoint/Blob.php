@@ -7,7 +7,7 @@ readonly class Blob {
     private \Closure $blob_factory;
     
     public function __construct(string $path) {
-        $this->blob_factory = fn(callable $handler, string $hash) => new \nostriphant\Functional\When(
+        $this->blob_factory = fn(callable $handler) => fn(string $hash) => new \nostriphant\Functional\When(
                                 'file_exists', 
                                 fn(string $blob_path) => $handler(new \nostriphant\Blossom\Blob($blob_path)), 
                                 fn(string $blob_path) => ['status' => 404],
@@ -15,8 +15,8 @@ readonly class Blob {
     }
     
     public function __invoke(callable $define) : void {
-        $redefine = fn(string $method, callable $handler) => $define($method, fn(array $attributes) => ($this->blob_factory)($handler, $attributes['hash']));
-        $redefine('OPTIONS', new Blob\Options());
-        $redefine('GET', new Blob\Get());
+        $redefine = fn(string $method, callable $handler) => $define($method, fn(array $attributes) => $handler($attributes['hash']));
+        $redefine('OPTIONS', ($this->blob_factory)(new Blob\Options()));
+        $redefine('GET', ($this->blob_factory)(new Blob\Get()));
     }
 }
