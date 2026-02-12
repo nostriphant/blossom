@@ -9,12 +9,10 @@ readonly class Blob implements Endpoint {
     private \Closure $blob_factory;
     
     public function __construct(string $path) {
-        $blob_existing = fn(callable $exists) => fn(string $blob_path) => $exists(new \nostriphant\Blossom\Blob($blob_path));
-        
-        $this->blob_factory = fn(callable $exists, string $hash) => new \nostriphant\Functional\When(
+        $this->blob_factory = fn(callable $handler, string $hash) => new \nostriphant\Functional\When(
                                 'file_exists', 
-                                $blob_existing($exists), 
-                                fn() => ['status' => 404],
+                                fn(string $blob_path) => $handler(new \nostriphant\Blossom\Blob($blob_path)), 
+                                fn(string $blob_path) => ['status' => 404],
                         )($path . DIRECTORY_SEPARATOR . $hash);
     }
     
