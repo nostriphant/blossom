@@ -25,7 +25,6 @@ readonly class Put {
             'status' => 201,
             'headers' => [ 
                 'Content-Type' => 'application/json',
-                'Content-Length' => strlen($content),
                 'Content-Location' => '/' . $blob->sha256
             ],
             'body' => $content

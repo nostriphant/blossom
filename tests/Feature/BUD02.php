@@ -41,6 +41,7 @@ it('The PUT /upload endpoint MUST accept binary data in the body of the request'
 
 
     expect($headers['content-location'])->toBe('/' . $expected_hash);
+    expect((int)$headers['content-length'])->toBe(strlen($body));
     expect($headers['access-control-allow-origin'])->toBe('*');
 });
 

@@ -17,7 +17,15 @@ readonly class Blossom {
                 $endpoint_methods[$endpoint][] = $method;
                 return $define($method->name, $endpoint, function(array $attributes, callable $stream) use ($handler) {
                     $response = $handler($attributes, $stream)();
-                    $response['headers'] = array_merge(['Access-Control-Allow-Origin' => '*'], $response['headers'] ?? []);
+                    
+                    $additional_headers = ['Access-Control-Allow-Origin' => '*'];
+                    if (isset($response['body']) === false) {
+                    } elseif(isset($headers['Content-Length']) === false) {
+                        $additional_headers['Content-Length'] = strlen($response['body']);
+                    }
+                    
+                    $response['headers'] = array_merge($additional_headers, $response['headers'] ?? []);
+                    
                     return $response;
                 });
             });
