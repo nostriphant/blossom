@@ -1,6 +1,6 @@
 <?php
 
-namespace nostriphant\Blossom\Endpoint\Upload;
+namespace nostriphant\Blossom\Endpoint;
 
 readonly class Options {
     private array $methods;
@@ -13,7 +13,7 @@ readonly class Options {
             'status' => '204',
             'headers' => [
                 'Access-Control-Allow-Origin' => 'Authorization, *',
-                'Access-Control-Allow-Methods' => join(',', array_map(fn(\nostriphant\Blossom\Method $method) => $method->name, $this->methods)),
+                'Access-Control-Allow-Methods' => join(', ', array_map(fn(\nostriphant\Blossom\Method $method) => $method->name, $this->methods)),
                 'Access-Control-Max-Age' => 86400
             ]
         ];
