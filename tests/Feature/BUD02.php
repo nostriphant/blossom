@@ -62,4 +62,7 @@ it('Servers MUST accept DELETE requests to the /<sha256> endpoint', function () 
     
     list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $blob_descriptor->sha256);
     expect($status)->toBe('404');
+    
+    list($protocol, $status, $headers, $body) = FeatureCase::request('DELETE', '/' . $blob_descriptor->sha256);
+    expect($status)->toBe('200');
 });
