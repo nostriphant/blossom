@@ -15,16 +15,6 @@ use nostriphant\BlossomTests\FeatureCase;
  */
 
 pest()->extend(FeatureCase::class)
-    ->beforeAll(function() {
-        expect(\nostriphant\BlossomTests\make_files_directory())->toBeTrue();
-        expect(\nostriphant\BlossomTests\files_directory())->toBeDirectory();
-
-        FeatureCase::relay_process();
-    })
-    ->afterAll(function() {
-        FeatureCase::end_relay_process();
-        \nostriphant\RelayTests\destroy_files_directory();
-    })
     ->group('feature')
     ->in('Feature');
     

@@ -21,6 +21,10 @@ readonly class Blob {
         $this->uploaded = filectime($path);
     }
     
+    static function delete(self $blob) : bool {
+        return unlink($blob->path);
+    }
+    
     public function __get(string $name): mixed {
         return match($name) {
             'contents' => file_get_contents($this->path),
