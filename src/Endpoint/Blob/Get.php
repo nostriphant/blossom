@@ -11,8 +11,7 @@ readonly class Get {
         }
         
         return [
-            'headers' => [
-                'Access-Control-Allow-Origin' => '*',   
+            'headers' => [ 
                 'Content-Type' => $this->blob->type,
                 'Content-Length' => $this->blob->size
             ],

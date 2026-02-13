@@ -15,7 +15,11 @@ readonly class Blossom {
         return function(callable $define) use ($endpoint_factory, $endpoint, &$endpoint_methods) {
             return $endpoint_factory(function(Method $method, callable $handler) use ($define, $endpoint, &$endpoint_methods) {
                 $endpoint_methods[$endpoint][] = $method;
-                return $define($method->name, $endpoint, fn(array $attributes, callable $stream) => $handler($attributes, $stream)());
+                return $define($method->name, $endpoint, function(array $attributes, callable $stream) use ($handler) {
+                    $response = $handler($attributes, $stream)();
+                    $response['headers'] = array_merge(['Access-Control-Allow-Origin' => '*'], $response['headers'] ?? []);
+                    return $response;
+                });
             });
         };
     }

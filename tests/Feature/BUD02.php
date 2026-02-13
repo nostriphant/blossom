@@ -41,6 +41,7 @@ it('The PUT /upload endpoint MUST accept binary data in the body of the request'
 
 
     expect($headers['content-location'])->toBe('/' . $expected_hash);
+    expect($headers['access-control-allow-origin'])->toBe('*');
 });
 
 
@@ -52,17 +53,22 @@ it('Servers MUST accept DELETE requests to the /<sha256> endpoint', function () 
 
     list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', '/upload', upload_resource: $resource);
     expect($status)->toBe('201');
+    expect($headers['access-control-allow-origin'])->toBe('*');
     $blob_descriptor = json_decode($body);
     
     list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $blob_descriptor->sha256);
     expect($status)->toBe('200');
+    expect($headers['access-control-allow-origin'])->toBe('*');
     
     list($protocol, $status, $headers, $body) = FeatureCase::request('DELETE', '/' . $blob_descriptor->sha256);
     expect($status)->toBe('204');
+    expect($headers['access-control-allow-origin'])->toBe('*');
     
     list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $blob_descriptor->sha256);
     expect($status)->toBe('404');
+    expect($headers['access-control-allow-origin'])->toBe('*');
     
     list($protocol, $status, $headers, $body) = FeatureCase::request('DELETE', '/' . $blob_descriptor->sha256);
     expect($status)->toBe('200');
+    expect($headers['access-control-allow-origin'])->toBe('*');
 });

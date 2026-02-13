@@ -13,10 +13,7 @@ readonly class Delete {
         \nostriphant\Blossom\Blob::delete($this->blob);
         
         return [
-            'status' =>  204,
-            'headers' => [
-                'Access-Control-Allow-Origin' => '*'
-            ]
+            'status' =>  204
         ];
     }
 }

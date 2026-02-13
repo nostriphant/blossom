@@ -23,8 +23,7 @@ readonly class Put {
         
         return [
             'status' => 201,
-            'headers' => [
-                'Access-Control-Allow-Origin' => '*',   
+            'headers' => [ 
                 'Content-Type' => 'application/json',
                 'Content-Length' => strlen($content),
                 'Content-Location' => '/' . $blob->sha256
