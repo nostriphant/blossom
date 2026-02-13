@@ -13,21 +13,19 @@ readonly class Put {
     public function __invoke() : array {
         $blob = ($this->blob)($this->stream);
         
-        $content = json_encode([
-                "url" => $blob->url,
-                "sha256" => $blob->sha256,
-                "size" => $blob->size,
-                "type" => $blob->type,
-                "uploaded" => $blob->uploaded
-            ]);
-        
         return [
             'status' => 201,
             'headers' => [ 
                 'Content-Type' => 'application/json',
                 'Content-Location' => '/' . $blob->sha256
             ],
-            'body' => $content
+            'body' => json_encode([
+                "url" => $blob->url,
+                "sha256" => $blob->sha256,
+                "size" => $blob->size,
+                "type" => $blob->type,
+                "uploaded" => $blob->uploaded
+            ])
         ];
     }
 }
