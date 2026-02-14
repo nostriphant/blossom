@@ -31,6 +31,8 @@ readonly class Blossom {
             return $unauthorized;
         } elseif (\nostriphant\NIP01\Event::hasTag($authorization_event, 'expiration') === false) {
             return $unauthorized;
+        } elseif (\nostriphant\NIP01\Event::extractTagValues($authorization_event, 'expiration')[0][0] < time()) {
+            return $unauthorized;
         }
         
         return $handler($authorization_event);

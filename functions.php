@@ -28,9 +28,10 @@ function request(string $method, string $uri, $upload_resource = null, ?array $a
         $sender_key = Key::fromHex('a71a415936f2dd70b777e5204c57e0df9a6dffef91b3c78c1aa24e54772e33c3');
         $sender_pubkey = $sender_key(Key::public());
         
-        $tags = [
-            ["expiration", time() + 3600]
-        ];
+        $tags = [];
+        if (isset($authorization['expiration']) === false) {
+            $tags[] = ["expiration", time() + 3600];
+        }
         foreach ($authorization as $tag => $value) {
             $tags[] = [$tag, $value];
         }
