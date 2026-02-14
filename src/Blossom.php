@@ -33,7 +33,7 @@ readonly class Blossom {
             return $unauthorized;
         }
         
-        return $handler;
+        return $handler($authorization_event);
     }
     
     static function authorization_middelware(Method $method, string $endpoint, callable $handler) : array {
@@ -50,8 +50,8 @@ readonly class Blossom {
         return function(callable $define) use ($endpoint_factory, $endpoint, &$endpoint_methods) {
             return $endpoint_factory(function(Method $method, callable $handler) use ($define, $endpoint, $endpoint_factory, &$endpoint_methods) {
                 $endpoint_methods[$endpoint][] = $method;
-                return $define(...self::authorization_middelware($method, $endpoint, function(array $attributes, callable $stream) use ($endpoint_factory, $handler) : array {
-                    $response = $handler(...$endpoint_factory->attributes($attributes, $stream))();
+                return $define(...self::authorization_middelware($method, $endpoint, fn(\nostriphant\NIP01\Event $authorization_event) => function(array $attributes, callable $stream) use ($authorization_event, $endpoint_factory, $handler) : array {
+                    $response = $handler(...$endpoint_factory->attributes($attributes, $stream))($authorization_event);
 
                     $additional_headers = ['Access-Control-Allow-Origin' => '*'];
                     if (isset($response['body']) === false) {
