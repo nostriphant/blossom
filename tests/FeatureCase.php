@@ -14,9 +14,9 @@ abstract class FeatureCase extends BaseTestCase
     
     static public $process;
     static public $runners = 0;
-    
-    static function request(string $method, string $path, $upload_resource = null, array $headers = []) : array {
-        return \nostriphant\Blossom\request($method, self::RELAY_URL . $path, $upload_resource, $headers);
+        
+    static function request(string $method, string $path, $upload_resource = null, ?array $authorization = null) : array {
+        return \nostriphant\Blossom\request($method, self::RELAY_URL . $path, $upload_resource, $authorization);
     }
     
     static function writeFile(string $content) {

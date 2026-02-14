@@ -17,6 +17,7 @@ readonly class Blob implements Factory {
     
     #[\Override]
     public function __invoke(callable $define) : void {
+        $define(\nostriphant\Blossom\Method::HEAD, fn(\nostriphant\Blossom\Blob $blob) => new Blob\Get($blob));
         $define(\nostriphant\Blossom\Method::GET, fn(\nostriphant\Blossom\Blob $blob) => new Blob\Get($blob));
         $define(\nostriphant\Blossom\Method::DELETE, fn(\nostriphant\Blossom\Blob $blob) => new Blob\Delete($blob));
     }

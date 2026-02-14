@@ -3,7 +3,7 @@
 namespace nostriphant\Blossom\Endpoint\Upload;
 
 
-readonly class Put {
+readonly class Put implements \nostriphant\Blossom\Endpoint {
     
     private \Closure $stream;
     

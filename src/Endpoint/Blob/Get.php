@@ -3,7 +3,7 @@
 namespace nostriphant\Blossom\Endpoint\Blob;
 
 
-readonly class Get {
+readonly class Get implements \nostriphant\Blossom\Endpoint {
     public function __construct(private \nostriphant\Blossom\Blob $blob) {}
     public function __invoke() : array {
         if ($this->blob->exists === false) {

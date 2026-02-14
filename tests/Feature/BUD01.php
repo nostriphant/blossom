@@ -31,9 +31,15 @@ describe("OPTIONS /<sha-256>", function() {
     });
 });
 
-it('GET /<sha-256>', function () {
+it('GET /<sha-256> without authorizations fails with 401', function () {
     $hash = FeatureCase::writeFile('Hello World!');
     list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $hash);
+    expect($status)->toBe('401');
+});
+
+it('GET /<sha-256>', function () {
+    $hash = FeatureCase::writeFile('Hello World!');
+    list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $hash, authorization: ['t' => 'get', 'x' => $hash]);
     expect($status)->toBe('200');
     expect($headers['content-type'])->toContain('text/plain');
     expect($headers['access-control-allow-origin'])->toBe('*');
@@ -42,7 +48,7 @@ it('GET /<sha-256>', function () {
 
 it('GET /<sha-256>.txt', function () {
     $hash = FeatureCase::writeFile('Hello World!');
-    list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $hash . '.txt');
+    list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $hash . '.txt', authorization: ['t' => 'get', 'x' => $hash]);
     expect($status)->toBe('200');
     expect($headers['content-type'])->toContain('text/plain');
     expect($headers['access-control-allow-origin'])->toBe('*');
@@ -51,7 +57,7 @@ it('GET /<sha-256>.txt', function () {
 
 it('HEAD /<sha-256>', function () {
     $hash = FeatureCase::writeFile('Hello World!');
-    list($protocol, $status, $headers, $body) = FeatureCase::request('HEAD', '/' . $hash);
+    list($protocol, $status, $headers, $body) = FeatureCase::request('HEAD', '/' . $hash, authorization: ['t' => 'get', 'x' => $hash]);
     expect($status)->toBe('200');
     expect($headers['content-type'])->toContain('text/plain');
     expect($headers['access-control-allow-origin'])->toBe('*');
@@ -60,7 +66,7 @@ it('HEAD /<sha-256>', function () {
 
 it('HEAD /<sha-256>.txt', function () {
     $hash = FeatureCase::writeFile('Hello World!');
-    list($protocol, $status, $headers, $body) = FeatureCase::request('HEAD', '/' . $hash . '.txt');
+    list($protocol, $status, $headers, $body) = FeatureCase::request('HEAD', '/' . $hash . '.txt', authorization: ['t' => 'get', 'x' => $hash]);
     expect($status)->toBe('200');
     expect($headers['content-type'])->toContain('text/plain');
     expect($headers['access-control-allow-origin'])->toBe('*');
@@ -68,7 +74,7 @@ it('HEAD /<sha-256>.txt', function () {
 });
 
 it('responds with 404 when file missing', function () {
-    list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/not-existing');
+    list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/not-existing', authorization: ['t' => 'get', 'x' => 'not-existing']);
     expect($status)->toBe('404');
     expect($headers['content-type'])->toContain('text/html');
 });

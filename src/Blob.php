@@ -15,10 +15,12 @@ readonly class Blob {
     public function __construct(private string $path) {
         $this->exists = file_exists($path);
         $this->sha256 = basename($path);
-        $this->type = 'text/plain';
-        $this->size = filesize($this->path);
-        $this->url = "http://127.0.0.1:8087/" . $this->sha256;
-        $this->uploaded = filectime($path);
+        if ($this->exists) {
+            $this->type = 'text/plain';
+            $this->size = filesize($this->path);
+            $this->url = "http://127.0.0.1:8087/" . $this->sha256;
+            $this->uploaded = filectime($path);
+        }
     }
     
     static function delete(self $blob) : bool {

@@ -4,7 +4,8 @@
     "homepage" : "https://github.com/nostriphant/blossom",
     "require": {
         "php": "^8.4",
-        "nostriphant/functional": "^2.3"
+        "nostriphant/functional": "^2.3",
+        "nostriphant/nip-01": "^2.2"
     },
     
     "license": "MIT",

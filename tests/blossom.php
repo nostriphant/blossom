@@ -6,7 +6,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $blossom = new \nostriphant\Blossom\Blossom(nostriphant\Blossom\data_directory() . '/files');
     
     $routes = $blossom();
-    nostriphant\Functional\Functions::iterator_walk($routes, fn(callable $route) => $route(fn(string $method, string $path, callable $endpoint) => $r->addRoute($method, $path, $endpoint)));
+    nostriphant\Functional\Functions::iterator_walk($routes, fn(callable $route) => $route([$r, 'addRoute']));
 });
 
 // Fetch method and URI from somewhere
@@ -29,7 +29,10 @@ switch ($routeInfo[0]) {
         header('HTTP/2 405', true);
         break;
     case FastRoute\Dispatcher::FOUND:
-        $handler = $routeInfo[1];
+        $authorization_endpoint = $routeInfo[1];
+        
+        $handler = $authorization_endpoint($_SERVER['HTTP_AUTHORIZATION'] ?? null);
+        
         $response = $handler($routeInfo[2], function() {
             $handle = fopen('php://input', 'rb');
             while (feof($handle) === false) {
