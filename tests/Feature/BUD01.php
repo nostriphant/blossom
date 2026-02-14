@@ -43,6 +43,8 @@ it('GET /<sha-256> without authorizations fails with 401', function () {
     expect($status)->toBe('401');
     list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $hash, authorization: ['t' => 'get', 'x' => $hash, 'key' => '6eeb5ad99e47115467d096e07c1c9b8b41768ab53465703f78017204adc5b0cc', 'pubkey' => '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f']);
     expect($status)->toBe('401');
+    list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $hash, authorization: ['t' => 'get', 'x' => 'sdfkjhsdkfjhsdkjf']);
+    expect($status)->toBe('401');
 });
 
 it('GET /<sha-256>', function () {

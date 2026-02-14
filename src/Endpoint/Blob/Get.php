@@ -8,6 +8,8 @@ readonly class Get implements \nostriphant\Blossom\Endpoint {
     public function __invoke(\nostriphant\NIP01\Event $authorization_event) : array {
         if (\nostriphant\NIP01\Event::hasTag($authorization_event, 'x') === false) {
             return ['status' => 401];
+        } elseif (\nostriphant\NIP01\Event::extractTagValues($authorization_event, 'x')[0][0] !== $this->blob->sha256) {
+            return ['status' => 401];
         }
         
         if ($this->blob->exists === false) {
