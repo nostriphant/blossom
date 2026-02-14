@@ -23,7 +23,9 @@ readonly class Blossom {
         }
         
         $authorization_event = new \nostriphant\NIP01\Event(...\nostriphant\NIP01\Nostr::decode(base64_decode($base64)));
-        if ($authorization_event->kind !== 24242) {
+        if (\nostriphant\NIP01\Event::verify($authorization_event) === false) {
+            return $unauthorized;
+        } elseif ($authorization_event->kind !== 24242) {
             return $unauthorized;
         } elseif (empty($authorization_event->content)) {
             return $unauthorized;

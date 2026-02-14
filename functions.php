@@ -27,9 +27,8 @@ function request(string $method, string $uri, $upload_resource = null, ?array $a
     if (isset($authorization)) {
         $sender_key = Key::fromHex($authorization['key'] ?? 'a71a415936f2dd70b777e5204c57e0df9a6dffef91b3c78c1aa24e54772e33c3');
         unset($authorization['key']);
-        $sender_pubkey = $authorization['pubkey'] ?? $sender_key(Key::public());
+        $sender_pubkey = $authorization['pubkey'] ?? $sender_key(Key::public()); // 15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f
         unset($authorization['pubkey']);
-        var_dump($sender_pubkey);
         
         $tags = [];
         if (isset($authorization['expiration']) === false) {
