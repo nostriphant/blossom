@@ -6,6 +6,10 @@ namespace nostriphant\Blossom\Endpoint\Blob;
 readonly class Get implements \nostriphant\Blossom\Endpoint {
     public function __construct(private \nostriphant\Blossom\Blob $blob) {}
     public function __invoke(\nostriphant\NIP01\Event $authorization_event) : array {
+        if (\nostriphant\NIP01\Event::hasTag($authorization_event, 'x') === false) {
+            return ['status' => 401];
+        }
+        
         if ($this->blob->exists === false) {
             return ['status' => 404];
         }

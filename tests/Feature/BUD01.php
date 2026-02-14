@@ -35,6 +35,10 @@ it('GET /<sha-256> without authorizations fails with 401', function () {
     $hash = FeatureCase::writeFile('Hello World!');
     list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $hash);
     expect($status)->toBe('401');
+    list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $hash, authorization: ['x' => $hash]);
+    expect($status)->toBe('401');
+    list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $hash, authorization: ['t' => 'get']);
+    expect($status)->toBe('401');
 });
 
 it('GET /<sha-256>', function () {
