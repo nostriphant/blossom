@@ -11,8 +11,20 @@ readonly class Blob implements \nostriphant\Blossom\Endpoint {
     
     #[\Override]
     public function __invoke(callable $define) : void {
-        $define(\nostriphant\Blossom\HTTP\Method::HEAD, fn(\nostriphant\Blossom\HTTP\ServerRequest $request) => new Blob\Get(new \nostriphant\Blossom\Blob($this->path . DIRECTORY_SEPARATOR . $request->attributes['hash'])));
-        $define(\nostriphant\Blossom\HTTP\Method::GET, fn(\nostriphant\Blossom\HTTP\ServerRequest $request) => new Blob\Get(new \nostriphant\Blossom\Blob($this->path . DIRECTORY_SEPARATOR . $request->attributes['hash'])));
-        $define(\nostriphant\Blossom\HTTP\Method::DELETE, fn(\nostriphant\Blossom\HTTP\ServerRequest $request) => new Blob\Delete(new \nostriphant\Blossom\Blob($this->path . DIRECTORY_SEPARATOR . $request->attributes['hash'])));
+        
+        $factory_factory = fn($class) => new class($class, fn(string $hash) => new \nostriphant\Blossom\Blob($this->path . DIRECTORY_SEPARATOR . $hash)) implements Action\Factory {
+            private \Closure $blob_factory;
+            public function __construct(private string $class, callable $blob_factory) {
+                $this->blob_factory = \Closure::fromCallable($blob_factory);
+            }
+            
+            public function __invoke(\nostriphant\Blossom\HTTP\ServerRequest $request) : \nostriphant\Blossom\Endpoint\Action {
+                return new ($this->class)(($this->blob_factory)($request->attributes['hash']));
+            }
+        };
+        
+        $define(\nostriphant\Blossom\HTTP\Method::HEAD, $factory_factory(Blob\Get::class));
+        $define(\nostriphant\Blossom\HTTP\Method::GET, $factory_factory(Blob\Get::class));
+        $define(\nostriphant\Blossom\HTTP\Method::DELETE, $factory_factory(Blob\Delete::class));
     }
 }
