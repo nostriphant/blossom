@@ -39,7 +39,6 @@ class Authorization {
             return $this->unauthorized;
         }
         
-        $action = ($this->endpoint)($request);
-        return $action->authorize($authorization_event) ? ($this->handler)($action()) : $this->unauthorized;
+        return new \nostriphant\Functional\When(fn(Endpoint\Action $action) => $action->authorize($authorization_event), $this->handler, fn() => $this->unauthorized)(($this->endpoint)($request));
     }
 }

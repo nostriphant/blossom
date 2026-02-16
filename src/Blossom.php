@@ -14,7 +14,8 @@ readonly class Blossom {
         return function(callable $define) use ($endpoint, $endpoint_path) : void {
             $endpoint_methods = [];
             $endpoint(function(HTTP\Method $method, callable $action) use ($define, $endpoint_path, &$endpoint_methods) {
-                $define($method->name, $endpoint_path, new Authorization($action, function(array $response) : array {
+                $define($method->name, $endpoint_path, new Authorization($action, function(Endpoint\Action $action) : array {
+                    $response = $action();
                     $additional_headers = ['Access-Control-Allow-Origin' => '*'];
                     if (isset($response['body']) === false) {
                     } elseif(isset($headers['Content-Length']) === false) {
