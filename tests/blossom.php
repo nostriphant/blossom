@@ -3,7 +3,7 @@
 require_once __DIR__ . '/bootstrap.php';
 
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
-    $blossom = new \nostriphant\Blossom\Blossom(nostriphant\Blossom\data_directory() . '/files');
+    $blossom = \nostriphant\Blossom\Blossom::fromPath(nostriphant\Blossom\data_directory() . '/files');
     
     $routes = $blossom();
     nostriphant\Functional\Functions::iterator_walk($routes, fn(callable $route) => $route([$r, 'addRoute']));

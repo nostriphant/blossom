@@ -5,10 +5,11 @@ namespace nostriphant\Blossom;
 use \nostriphant\Functional\FunctionList;
 
 readonly class Blossom {
+    public function __construct(private Blob\Factory $factory) {
+    }
     
-    private Blob\Factory $factory;
-    public function __construct(string $path) {
-        $this->factory = new Blob\Factory($path);
+    static function fromPath(string $path) : self {
+        return new self(new Blob\Factory($path));
     }
     
     static function wrap(string $endpoint_path, Endpoint $endpoint) : callable {
