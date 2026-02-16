@@ -49,12 +49,11 @@ readonly class Blossom {
         }];
     }
     
-    static function wrap(string $endpoint, Endpoint\Factory $endpoint_factory, array &$endpoint_methods) : callable {
-        $endpoint_methods[$endpoint] = [];
-        return function(callable $define) use ($endpoint_factory, $endpoint, &$endpoint_methods) {
-            return $endpoint_factory(function(Method $method, callable $handler) use ($define, $endpoint, $endpoint_factory, &$endpoint_methods) {
-                $endpoint_methods[$endpoint][] = $method;
-                return $define(...self::authorization_middelware($method, $endpoint, fn(\nostriphant\NIP01\Event $authorization_event) => function(array $attributes, callable $stream) use ($authorization_event, $endpoint_factory, $handler) : array {
+    static function wrap(string $endpoint, Endpoint\Factory $endpoint_factory) : callable {
+        return function(callable $define) use ($endpoint_factory, $endpoint) : void {
+            $endpoint_methods = [];
+            $endpoint_factory(function(Method $method, callable $handler) use ($define, $endpoint, $endpoint_factory, &$endpoint_methods) {
+                $define(...self::authorization_middelware($method, $endpoint, fn(\nostriphant\NIP01\Event $authorization_event) => function(array $attributes, callable $stream) use ($authorization_event, $endpoint_factory, $handler) : array {
                     $response = $handler(...$endpoint_factory->attributes($attributes, $stream))($authorization_event);
 
                     $additional_headers = ['Access-Control-Allow-Origin' => '*'];
@@ -67,17 +66,15 @@ readonly class Blossom {
 
                     return $response;
                 }));
-                
+                $endpoint_methods[] = $method;
             });
+
+            $define('OPTIONS', $endpoint, fn(?string $authorization = null) => fn(array $attributes, callable $stream) => (new Endpoint\Options(...iterator_to_array($endpoint_methods)))());
         };
     }
 
     public function __invoke() : \Generator {
-        $endpoint_methods = [];
-        yield self::wrap('/upload', new Endpoint\Upload($this->path), $endpoint_methods);
-        yield self::wrap('/{hash:\w+}[.{ext:\w+}]', new Endpoint\Blob($this->path), $endpoint_methods);
-        foreach ($endpoint_methods as $endpoint => $methods) {
-            yield fn(callable $define) => $define(...self::authorization_middelware(Method::OPTIONS, $endpoint, fn(array $attributes, callable $stream) => (new Endpoint\Options(...$methods))()));
-        }
+        yield self::wrap('/upload', new Endpoint\Upload($this->path));
+        yield self::wrap('/{hash:\w+}[.{ext:\w+}]', new Endpoint\Blob($this->path));
     }
 }
