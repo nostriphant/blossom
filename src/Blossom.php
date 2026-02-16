@@ -13,8 +13,8 @@ readonly class Blossom {
     static function wrap(string $endpoint_path, Endpoint $endpoint) : callable {
         return function(callable $define) use ($endpoint, $endpoint_path) : void {
             $endpoint_methods = [];
-            $endpoint(function(HTTP\Method $method, callable $action) use ($define, $endpoint_path, &$endpoint_methods) {
-                $define($method->name, $endpoint_path, new Authorization($action, function(Endpoint\Action $action) : array {
+            $endpoint(function(HTTP\Method $method, callable $action_factory) use ($define, $endpoint_path, &$endpoint_methods) {
+                $define($method->name, $endpoint_path, new Authorization($action_factory, function(Endpoint\Action $action) : array {
                     $response = $action();
                     $additional_headers = ['Access-Control-Allow-Origin' => '*'];
                     if (isset($response['body']) === false) {
