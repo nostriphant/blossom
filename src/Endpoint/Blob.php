@@ -3,11 +3,10 @@
 namespace nostriphant\Blossom\Endpoint;
 
 readonly class Blob implements \nostriphant\Blossom\Endpoint {
-    
     private Blob\Factory $factory;
     
-    public function __construct(string $path) {
-        $this->factory = new Blob\Factory(fn(string $hash) => new \nostriphant\Blossom\Blob($path . DIRECTORY_SEPARATOR . $hash));
+    public function __construct(callable $blob_factory) {
+        $this->factory = new Blob\Factory($blob_factory);
     }
     
     

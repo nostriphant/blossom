@@ -35,6 +35,6 @@ readonly class Blossom {
 
     public function __invoke() : \Generator {
         yield self::wrap('/upload', new Endpoint\Upload($this->path));
-        yield self::wrap('/{hash:\w+}[.{ext:\w+}]', new Endpoint\Blob($this->path));
+        yield self::wrap('/{hash:\w+}[.{ext:\w+}]', new Endpoint\Blob(fn(string $hash) => new \nostriphant\Blossom\Blob($this->path . DIRECTORY_SEPARATOR . $hash)));
     }
 }
