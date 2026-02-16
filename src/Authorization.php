@@ -10,7 +10,7 @@ class Authorization {
         $this->handler = \Closure::fromCallable($handler);
     }
     
-    public function __invoke(ServerRequest $request) : array {
+    public function __invoke(HTTP\ServerRequest $request) : array {
         $authorization = $request->headers['HTTP_AUTHORIZATION'] ?? null;
         
         if (isset($authorization) === false) {

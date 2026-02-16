@@ -1,6 +1,6 @@
 <?php
 
-namespace nostriphant\Blossom;
+namespace nostriphant\Blossom\HTTP;
 
 readonly class ServerRequest {
     

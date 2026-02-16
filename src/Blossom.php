@@ -14,7 +14,7 @@ readonly class Blossom {
         return function(callable $define) use ($endpoint_factory, $endpoint) : void {
             $endpoint_methods = [];
             $endpoint_factory(function(Method $method, callable $handler) use ($define, $endpoint, $endpoint_factory, &$endpoint_methods) {
-                $define($method->name, $endpoint, fn(ServerRequest $request) => ((new Authorization(function(\nostriphant\NIP01\Event $authorization_event) use ($request, $endpoint_factory, $handler) : array {
+                $define($method->name, $endpoint, fn(HTTP\ServerRequest $request) => ((new Authorization(function(\nostriphant\NIP01\Event $authorization_event) use ($request, $endpoint_factory, $handler) : array {
                     $response = $handler($request)($authorization_event);
 
                     $additional_headers = ['Access-Control-Allow-Origin' => '*'];
@@ -30,7 +30,7 @@ readonly class Blossom {
                 $endpoint_methods[] = $method;
             });
 
-            $define('OPTIONS', $endpoint, fn(ServerRequest $request) => (new Endpoint\Options(...iterator_to_array($endpoint_methods)))());
+            $define('OPTIONS', $endpoint, fn(HTTP\ServerRequest $request) => (new Endpoint\Options(...iterator_to_array($endpoint_methods)))());
         };
     }
 

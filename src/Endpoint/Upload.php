@@ -11,6 +11,6 @@ readonly class Upload implements Factory {
     
     #[\Override]
     public function __invoke(callable $define): void {
-        $define(\nostriphant\Blossom\Method::PUT, fn(\nostriphant\Blossom\ServerRequest $request) => new Upload\Put(new \nostriphant\Blossom\Blob\Uncreated($this->path), $request));
+        $define(\nostriphant\Blossom\Method::PUT, fn(\nostriphant\Blossom\HTTP\ServerRequest $request) => new Upload\Put(new \nostriphant\Blossom\Blob\Uncreated($this->path), $request));
     }
 }
