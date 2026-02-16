@@ -4,10 +4,10 @@ namespace nostriphant\Blossom\Endpoint;
 
 readonly class Upload implements \nostriphant\Blossom\Endpoint {
     
-    private Upload\Factory $factory;
+    private Factory $factory;
     
     public function __construct(callable $blob_factory) {
-        $this->factory = new Upload\Factory($blob_factory);
+        $this->factory = new Factory(fn(\nostriphant\Blossom\HTTP\ServerRequest $request) => [$blob_factory(), $request]);
     }
     
     #[\Override]
