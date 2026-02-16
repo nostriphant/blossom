@@ -29,18 +29,9 @@ switch ($routeInfo[0]) {
         header('HTTP/2 405', true);
         break;
     case FastRoute\Dispatcher::FOUND:
-        $authorization_endpoint = $routeInfo[1];
-        
-        $handler = $authorization_endpoint($_SERVER['HTTP_AUTHORIZATION'] ?? null);
-        
-        $response = $handler($routeInfo[2], function() {
-            $handle = fopen('php://input', 'rb');
-            while (feof($handle) === false) {
-                yield fread($handle, 1024);
-            }
-            fclose($handle);
-        });
-        
+        $headers = array_filter($_SERVER, fn(string $key) => str_starts_with($key, 'HTTP_'), ARRAY_FILTER_USE_KEY);
+        $response = $routeInfo[1](new \nostriphant\Blossom\ServerRequest($headers, $routeInfo[2], fopen('php://input', 'rb')));
+        error_log(var_Export($response, true));
         header('HTTP/2 ' . ($response['status'] ?? '200'), true);
         
         $headers = $response['headers'] ?? [];

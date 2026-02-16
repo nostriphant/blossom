@@ -4,14 +4,15 @@ namespace nostriphant\Blossom;
 
 class Authorization {
     private \Closure $handler;
-    private \Closure $unauthorized;
+    private array $unauthorized = ['status' => 401];
     
     public function __construct(callable $handler) {
         $this->handler = \Closure::fromCallable($handler);
-        $this->unauthorized = \Closure::fromCallable(fn(array $attributes, callable $stream) => ['status' => 401]);
     }
     
-    public function __invoke(?string $authorization = null) {
+    public function __invoke(ServerRequest $request) : array {
+        $authorization = $request->headers['HTTP_AUTHORIZATION'] ?? null;
+        
         if (isset($authorization) === false) {
             return $this->unauthorized;
         }
