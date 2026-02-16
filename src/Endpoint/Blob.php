@@ -5,7 +5,7 @@ namespace nostriphant\Blossom\Endpoint;
 readonly class Blob implements \nostriphant\Blossom\Endpoint {
     private Factory $factory;
     
-    public function __construct(callable $blob_factory) {
+    public function __construct(\nostriphant\Blossom\Blob\Factory $blob_factory) {
         $this->factory = new Factory(fn(\nostriphant\Blossom\HTTP\ServerRequest $request) => [$blob_factory($request->attributes['hash'])]);
     }
     

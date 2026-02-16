@@ -6,8 +6,9 @@ use \nostriphant\Functional\FunctionList;
 
 readonly class Blossom {
     
-    public function __construct(private string $path) {
-       
+    private Blob\Factory $factory;
+    public function __construct(string $path) {
+        $this->factory = new Blob\Factory($path);
     }
     
     static function wrap(string $endpoint_path, Endpoint $endpoint) : callable {
@@ -34,7 +35,7 @@ readonly class Blossom {
     }
 
     public function __invoke() : \Generator {
-        yield self::wrap('/upload', new Endpoint\Upload(fn() => new \nostriphant\Blossom\Blob\Uncreated($this->path)));
-        yield self::wrap('/{hash:\w+}[.{ext:\w+}]', new Endpoint\Blob(fn(string $hash) => new \nostriphant\Blossom\Blob($this->path . DIRECTORY_SEPARATOR . $hash)));
+        yield self::wrap('/upload', new Endpoint\Upload($this->factory));
+        yield self::wrap('/{hash:\w+}[.{ext:\w+}]', new Endpoint\Blob($this->factory));
     }
 }
