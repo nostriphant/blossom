@@ -91,6 +91,9 @@ it('Servers MUST accept DELETE requests to the /<sha256> endpoint', function (st
     expect($status)->toBe('200');
     expect($headers['access-control-allow-origin'])->toBe('*');
     
+    list($protocol, $status, $headers, $body) = FeatureCase::request('DELETE', '/' . $blob_descriptor->sha256, authorization:['t' => 'delete', 'x' => $hash, 'key' => '6eeb5ad99e47115467d096e07c1c9b8b41768ab53465703f78017204adc5b0cc']);
+    expect($status)->toBe('403');
+    
     list($protocol, $status, $headers, $body) = FeatureCase::request('DELETE', '/' . $blob_descriptor->sha256, authorization:['t' => 'delete', 'x' => $hash]);
     expect($status)->toBe('204');
     expect($headers['access-control-allow-origin'])->toBe('*');
