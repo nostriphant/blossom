@@ -52,16 +52,16 @@
         },
         {
             "name": "nostriphant/nip-01",
-            "version": "2.3.0",
+            "version": "2.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/nip-01.git",
-                "reference": "4f31fabb24a90b0d4e4e0b201c84aa3a3382e568"
+                "reference": "a9c91a5269c48d4d9798f09ec6d21bcec071ec15"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/nip-01/zipball/4f31fabb24a90b0d4e4e0b201c84aa3a3382e568",
-                "reference": "4f31fabb24a90b0d4e4e0b201c84aa3a3382e568",
+                "url": "https://api.github.com/repos/nostriphant/nip-01/zipball/a9c91a5269c48d4d9798f09ec6d21bcec071ec15",
+                "reference": "a9c91a5269c48d4d9798f09ec6d21bcec071ec15",
                 "shasum": ""
             },
             "require": {
@@ -92,9 +92,9 @@
             "description": "Nostr NIP-01 implementation in PHP",
             "support": {
                 "issues": "https://github.com/nostriphant/nip-01/issues",
-                "source": "https://github.com/nostriphant/nip-01/tree/2.3.0"
+                "source": "https://github.com/nostriphant/nip-01/tree/2.3.1"
             },
-            "time": "2026-02-14T19:32:38+00:00"
+            "time": "2026-02-16T18:26:51+00:00"
         },
         {
             "name": "simplito/bigint-wrapper-php",
