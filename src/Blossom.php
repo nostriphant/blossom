@@ -10,41 +10,11 @@ readonly class Blossom {
        
     }
     
-    static function authorize(?string $authorization, callable $handler) {
-        $unauthorized = fn(array $attributes, callable $stream) => ['status' => 401];
-        
-        if (isset($authorization) === false) {
-            return $unauthorized;
-        }
-        
-        list($type, $base64) = explode(' ', trim($authorization));
-        if (strcasecmp($type, 'nostr') !== 0) {
-            return $unauthorized;
-        }
-        
-        $authorization_event = new \nostriphant\NIP01\Event(...\nostriphant\NIP01\Nostr::decode(base64_decode($base64)));
-        if (\nostriphant\NIP01\Event::verify($authorization_event) === false) {
-            return $unauthorized;
-        } elseif ($authorization_event->kind !== 24242) {
-            return $unauthorized;
-        } elseif (empty($authorization_event->content)) {
-            return $unauthorized;
-        } elseif (\nostriphant\NIP01\Event::hasTag($authorization_event, 't') === false) {
-            return $unauthorized;
-        } elseif (\nostriphant\NIP01\Event::hasTag($authorization_event, 'expiration') === false) {
-            return $unauthorized;
-        } elseif (\nostriphant\NIP01\Event::extractTagValues($authorization_event, 'expiration')[0][0] < time()) {
-            return $unauthorized;
-        }
-        
-        return $handler($authorization_event);
-    }
-    
     static function wrap(string $endpoint, Endpoint\Factory $endpoint_factory) : callable {
         return function(callable $define) use ($endpoint_factory, $endpoint) : void {
             $endpoint_methods = [];
             $endpoint_factory(function(Method $method, callable $handler) use ($define, $endpoint, $endpoint_factory, &$endpoint_methods) {
-                $define($method->name, $endpoint, fn(?string $authorization = null) : callable  => self::authorize($authorization, fn(\nostriphant\NIP01\Event $authorization_event) => function(array $attributes, callable $stream) use ($authorization_event, $endpoint_factory, $handler) : array {
+                $define($method->name, $endpoint, new Authorization(fn(\nostriphant\NIP01\Event $authorization_event) => function(array $attributes, callable $stream) use ($authorization_event, $endpoint_factory, $handler) : array {
                     $response = $handler(...$endpoint_factory->attributes($attributes, $stream))($authorization_event);
 
                     $additional_headers = ['Access-Control-Allow-Origin' => '*'];
