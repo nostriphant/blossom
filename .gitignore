@@ -1,3 +1,5 @@
+.env
+
 /nbproject/private/
 /vendor
 /logs

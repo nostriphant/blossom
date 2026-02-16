@@ -29,6 +29,9 @@ it('The PUT /upload endpoint MUST accept binary data in the body of the request'
     fseek($resource, 0);
     
     $hash = hash('sha256', 'Hello World!!!');
+    
+    list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', '/upload', upload_resource: tmpfile(), authorization:['t' => 'upload', 'x' => $hash, 'key' => '6eeb5ad99e47115467d096e07c1c9b8b41768ab53465703f78017204adc5b0cc']);
+    expect($status)->toBe('401');
 
     list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', '/upload', upload_resource: $resource, authorization:['t' => 'upload', 'x' => $hash]);
     expect($status)->toBe('201');
