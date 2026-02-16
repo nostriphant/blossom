@@ -2,7 +2,7 @@
 
 namespace nostriphant\Blossom\Endpoint;
 
-readonly class Blob implements Factory {
+readonly class Blob implements \nostriphant\Blossom\Endpoint {
     
     
     public function __construct(private string $path) {

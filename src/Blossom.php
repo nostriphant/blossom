@@ -10,7 +10,7 @@ readonly class Blossom {
        
     }
     
-    static function wrap(string $endpoint, Endpoint\Factory $endpoint_factory) : callable {
+    static function wrap(string $endpoint, Endpoint $endpoint_factory) : callable {
         return function(callable $define) use ($endpoint_factory, $endpoint) : void {
             $endpoint_methods = [];
             $endpoint_factory(function(HTTP\Method $method, callable $handler) use ($define, $endpoint, $endpoint_factory, &$endpoint_methods) {

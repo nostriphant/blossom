@@ -1,7 +1,7 @@
 <?php
 
-namespace nostriphant\Blossom\Endpoint;
+namespace nostriphant\Blossom;
 
-interface Factory {
+interface Endpoint {
     public function __invoke(callable $define) : void;
 }

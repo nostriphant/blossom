@@ -2,7 +2,7 @@
 
 namespace nostriphant\Blossom\Endpoint;
 
-readonly class Upload implements Factory {
+readonly class Upload implements \nostriphant\Blossom\Endpoint {
     
     
     public function __construct(private string $path) {
