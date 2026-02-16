@@ -48,7 +48,7 @@ readonly class Blossom {
         return function(callable $define) use ($endpoint_factory, $endpoint) : void {
             $endpoint_methods = [];
             $endpoint_factory(function(Method $method, callable $handler) use ($define, $endpoint, $endpoint_factory, &$endpoint_methods) {
-                $define(...self::authorization_middelware($method, $endpoint, fn(\nostriphant\NIP01\Event $authorization_event) => function(array $attributes, callable $stream) use ($authorization_event, $endpoint_factory, $handler) : array {
+                $define($method->name, $endpoint, fn(?string $authorization = null) : callable  => self::authorize($authorization, fn(\nostriphant\NIP01\Event $authorization_event) => function(array $attributes, callable $stream) use ($authorization_event, $endpoint_factory, $handler) : array {
                     $response = $handler(...$endpoint_factory->attributes($attributes, $stream))($authorization_event);
 
                     $additional_headers = ['Access-Control-Allow-Origin' => '*'];
