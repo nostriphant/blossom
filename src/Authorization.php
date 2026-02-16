@@ -3,10 +3,12 @@
 namespace nostriphant\Blossom;
 
 class Authorization {
+    private \Closure $endpoint;
     private \Closure $handler;
     private array $unauthorized = ['status' => 401];
     
-    public function __construct(callable $handler) {
+    public function __construct(callable $endpoint, callable $handler) {
+        $this->endpoint = \Closure::fromCallable($endpoint);
         $this->handler = \Closure::fromCallable($handler);
     }
     
@@ -37,6 +39,7 @@ class Authorization {
             return $this->unauthorized;
         }
         
-        return ($this->handler)($authorization_event);
+        $action = ($this->endpoint)($request);
+        return $action->authorize($authorization_event) ? ($this->handler)($action()) : $this->unauthorized;
     }
 }

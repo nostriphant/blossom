@@ -10,7 +10,12 @@ readonly class Put implements \nostriphant\Blossom\Endpoint\Action {
     public function __construct(private \nostriphant\Blossom\Blob\Uncreated $blob, callable $stream) {
         $this->stream = \Closure::fromCallable($stream);
     }
-    public function __invoke(\nostriphant\NIP01\Event $authorization_event) : array {
+    
+    public function authorize(\nostriphant\NIP01\Event $authorization_event) : bool {
+        return true;
+    }
+    
+    public function __invoke() : array {
         $blob = ($this->blob)($this->stream);
         
         return [

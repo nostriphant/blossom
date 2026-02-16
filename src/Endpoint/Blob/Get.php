@@ -5,15 +5,20 @@ namespace nostriphant\Blossom\Endpoint\Blob;
 
 readonly class Get implements \nostriphant\Blossom\Endpoint\Action {
     public function __construct(private \nostriphant\Blossom\Blob $blob) {}
-    public function __invoke(\nostriphant\NIP01\Event $authorization_event) : array {
+    
+    public function authorize(\nostriphant\NIP01\Event $authorization_event) : bool {
         if (\nostriphant\NIP01\Event::hasTag($authorization_event, 'x') === false) {
-            return ['status' => 401];
+            return false;
         } elseif (\nostriphant\NIP01\Event::extractTagValues($authorization_event, 'x')[0][0] !== $this->blob->sha256) {
-            return ['status' => 401];
-        } elseif ($this->blob->exists === false) {
-            return ['status' => 404];
+            return false;
         }
-        
+        return true;
+    }
+    
+    public function __invoke() : array {
+        if ($this->blob->exists === false) {
+            return ['status' => 404];;
+        }
         return [
             'headers' => [ 
                 'Content-Type' => $this->blob->type,

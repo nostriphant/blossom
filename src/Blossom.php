@@ -10,13 +10,11 @@ readonly class Blossom {
        
     }
     
-    static function wrap(string $endpoint, Endpoint $endpoint_factory) : callable {
-        return function(callable $define) use ($endpoint_factory, $endpoint) : void {
+    static function wrap(string $endpoint_path, Endpoint $endpoint) : callable {
+        return function(callable $define) use ($endpoint, $endpoint_path) : void {
             $endpoint_methods = [];
-            $endpoint_factory(function(HTTP\Method $method, callable $action) use ($define, $endpoint, $endpoint_factory, &$endpoint_methods) {
-                $define($method->name, $endpoint, fn(HTTP\ServerRequest $request) => ((new Authorization(function(\nostriphant\NIP01\Event $authorization_event) use ($request, $endpoint_factory, $action) : array {
-                    $response = $action($request)($authorization_event);
-
+            $endpoint(function(HTTP\Method $method, callable $action) use ($define, $endpoint_path, &$endpoint_methods) {
+                $define($method->name, $endpoint_path, new Authorization($action, function(array $response) : array {
                     $additional_headers = ['Access-Control-Allow-Origin' => '*'];
                     if (isset($response['body']) === false) {
                     } elseif(isset($headers['Content-Length']) === false) {
@@ -26,11 +24,11 @@ readonly class Blossom {
                     $response['headers'] = array_merge($additional_headers, $response['headers'] ?? []);
 
                     return $response;
-                }))($request)));
+                }));
                 $endpoint_methods[] = $method;
             });
 
-            $define('OPTIONS', $endpoint, fn(HTTP\ServerRequest $request) => (new Endpoint\Action\Options(...iterator_to_array($endpoint_methods)))());
+            $define('OPTIONS', $endpoint_path, fn(HTTP\ServerRequest $request) => (new Endpoint\Action\Options(...iterator_to_array($endpoint_methods)))());
         };
     }
 
