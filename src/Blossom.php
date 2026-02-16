@@ -30,7 +30,7 @@ readonly class Blossom {
                 $endpoint_methods[] = $method;
             });
 
-            $define('OPTIONS', $endpoint, fn(HTTP\ServerRequest $request) => (new Endpoint\Options(...iterator_to_array($endpoint_methods)))());
+            $define('OPTIONS', $endpoint, fn(HTTP\ServerRequest $request) => (new Endpoint\Action\Options(...iterator_to_array($endpoint_methods)))());
         };
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace nostriphant\Blossom\Endpoint;
+namespace nostriphant\Blossom\Endpoint\Action;
 
 readonly class Options {
     private array $methods;

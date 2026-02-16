@@ -1,9 +1,9 @@
 <?php
 
 
-namespace nostriphant\Blossom;
+namespace nostriphant\Blossom\Endpoint;
 
-interface Endpoint {
+interface Action {
     
     public function __invoke(\nostriphant\NIP01\Event $authorization_event) : array;
 }
