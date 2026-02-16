@@ -4,7 +4,9 @@ namespace nostriphant\Blossom;
 
 use \nostriphant\Functional\FunctionList;
 
-readonly class Blossom {
+readonly class Blossom implements \IteratorAggregate {
+    
+    
     public function __construct(private Blob\Factory $factory) {
     }
     
@@ -35,7 +37,8 @@ readonly class Blossom {
         };
     }
 
-    public function __invoke() : \Generator {
+    #[\Override]
+    public function getIterator(): \Traversable {
         yield self::wrap('/upload', new Endpoint\Upload($this->factory));
         yield self::wrap('/{hash:\w+}[.{ext:\w+}]', new Endpoint\Blob($this->factory));
     }

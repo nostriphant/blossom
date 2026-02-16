@@ -5,8 +5,7 @@ require_once __DIR__ . '/bootstrap.php';
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $blossom = \nostriphant\Blossom\Blossom::fromPath(nostriphant\Blossom\data_directory() . '/files');
     
-    $routes = $blossom();
-    nostriphant\Functional\Functions::iterator_walk($routes, fn(callable $route) => $route([$r, 'addRoute']));
+    nostriphant\Functional\Functions::iterator_walk($blossom, fn(callable $route) => $route([$r, 'addRoute']));
 });
 
 // Fetch method and URI from somewhere
