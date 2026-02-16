@@ -15,12 +15,12 @@ readonly class Delete implements \nostriphant\Blossom\Endpoint\Action {
         return true;
     }
     
-    public function __invoke() : array {
+    public function __invoke(string $pubkey_hex) : array {
         if ($this->blob->exists === false) {
             return ['status' => 200];
         }
         
-        \nostriphant\Blossom\Blob::delete($this->blob);
+        \nostriphant\Blossom\Blob::delete($this->blob, $pubkey_hex);
         
         return ['status' =>  204];
     }

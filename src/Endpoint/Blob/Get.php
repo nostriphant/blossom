@@ -15,7 +15,7 @@ readonly class Get implements \nostriphant\Blossom\Endpoint\Action {
         return true;
     }
     
-    public function __invoke() : array {
+    public function __invoke(string $pubkey_hex) : array {
         if ($this->blob->exists === false) {
             return ['status' => 404];;
         }

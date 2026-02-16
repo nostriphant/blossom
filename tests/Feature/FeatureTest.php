@@ -35,5 +35,4 @@ foreach (glob(__DIR__ . '/BUD*.php') as $test_file) {
 
     unlink(self::LOG_ERRORS);
     unlink(self::LOG_OUTPUT);
-    \nostriphant\RelayTests\destroy_files_directory();
 });

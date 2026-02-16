@@ -8,7 +8,7 @@ class Uncreated {
         
     }
     
-    public function __invoke(callable $stream): \nostriphant\Blossom\Blob {
+    public function __invoke(string $pubkey_hex, callable $stream): \nostriphant\Blossom\Blob {
         $temp = tempnam($this->path, "buffer.");
         
         $handle = fopen($temp, 'wb');
@@ -18,7 +18,13 @@ class Uncreated {
         fclose($handle);
         
         $target_location = $this->path . DIRECTORY_SEPARATOR . hash_file('sha256', $temp);
-        rename($temp, $target_location);
+        if (file_exists($target_location) === false) {
+            rename($temp, $target_location);
+            mkdir($target_location . '.owners');
+        }
+        
+        touch($target_location . '.owners' . DIRECTORY_SEPARATOR . $pubkey_hex);
+        
         return new \nostriphant\Blossom\Blob($target_location);
     }
     

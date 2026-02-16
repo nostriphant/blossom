@@ -64,8 +64,11 @@ function request(string $method, string $uri, $upload_resource = null, ?array $a
     } , []), $response_body];
 }
 
-function writeFile(string $directory, string $content) {
+function writeFile(string $directory, string $content) : string {
     $hash = hash('sha256', $content);
     file_put_contents($directory . DIRECTORY_SEPARATOR . $hash, $content);
     return $hash;
+}
+function deleteFile(string $directory, string $hash) : bool {
+    return unlink($directory . DIRECTORY_SEPARATOR . $hash);
 }

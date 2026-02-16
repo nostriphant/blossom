@@ -19,11 +19,18 @@ abstract class FeatureCase extends BaseTestCase
         return \nostriphant\Blossom\request($method, self::RELAY_URL . $path, $upload_resource, $authorization);
     }
     
-    static function writeFile(string $content) {
+    static function writeFile(string $content) : string {
         $directory = files_directory();
         $hash = \nostriphant\Blossom\writeFile($directory, $content);
         expect($directory . DIRECTORY_SEPARATOR . $hash)->toBeFile();
         expect(file_get_contents($directory . DIRECTORY_SEPARATOR . $hash))->toBe($content);
         return $hash;
+    }
+    static function deleteFile(string $hash) : bool {
+        $directory = files_directory();
+        $result = \nostriphant\Blossom\deleteFile($directory, $hash);
+        expect($result)->toBeTrue();
+        expect($directory . DIRECTORY_SEPARATOR . $hash)->not()->toBeFile();
+        return $result;
     }
 }

@@ -16,9 +16,9 @@ readonly class Put implements \nostriphant\Blossom\Endpoint\Action {
     public function authorize(\nostriphant\NIP01\Event $authorization_event) : bool {
         return call_user_func($this->upload_authorized, $authorization_event->pubkey);
     }
-    
-    public function __invoke() : array {
-        $blob = ($this->blob)($this->stream);
+   #[\Override]
+    public function __invoke(string $pubkey_hex) : array {
+        $blob = ($this->blob)($pubkey_hex, $this->stream);
         
         return [
             'status' => 201,

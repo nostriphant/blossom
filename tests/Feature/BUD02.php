@@ -22,17 +22,22 @@ describe("OPTIONS /upload", function() {
     });
 });
 
-it('The PUT /upload endpoint MUST accept binary data in the body of the request', function () {
+it('The PUT /upload endpoint MUST accept binary data in the body of the request', function (string $contents, string $hash) {
 
     $resource = tmpfile();
-    fwrite($resource, 'Hello World!!!');
+    fwrite($resource, $contents);
     fseek($resource, 0);
     
-    $hash = hash('sha256', 'Hello World!!!');
+    $hash_file = \nostriphant\BlossomTests\files_directory() . DIRECTORY_SEPARATOR . $hash;
     
     list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', '/upload', upload_resource: tmpfile(), authorization:['t' => 'upload', 'x' => $hash, 'key' => '6eeb5ad99e47115467d096e07c1c9b8b41768ab53465703f78017204adc5b0cc']);
     expect($status)->toBe('401');
 
+    
+    expect($hash_file)->not()->toBeFile();
+    expect($hash_file . '.owners')->not()->toBeDirectory();
+    expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
+    
     list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', '/upload', upload_resource: $resource, authorization:['t' => 'upload', 'x' => $hash]);
     expect($status)->toBe('201');
 
@@ -48,21 +53,39 @@ it('The PUT /upload endpoint MUST accept binary data in the body of the request'
     expect($headers['content-location'])->toBe('/' . $expected_hash);
     expect((int)$headers['content-length'])->toBe(strlen($body));
     expect($headers['access-control-allow-origin'])->toBe('*');
-});
+    
+    expect($hash_file)->toBeFile();
+    expect($hash_file . '.owners')->toBeDirectory();
+    expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->toBeFile();
+    
+    unlink($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f');
+    rmdir($hash_file . '.owners');
+    unlink($hash_file);
+})->with([
+    [$contents = 'Hello World!!!', hash('sha256', $contents)]
+]);
 
 
-it('Servers MUST accept DELETE requests to the /<sha256> endpoint', function () {
+it('Servers MUST accept DELETE requests to the /<sha256> endpoint', function (string $contents, string $hash) {
 
     $resource = tmpfile();
-    fwrite($resource, 'Hello World!!!');
+    fwrite($resource, $contents);
     fseek($resource, 0);
     
-    $hash = hash('sha256', 'Hello World!!!');
+    $hash_file = \nostriphant\BlossomTests\files_directory() . DIRECTORY_SEPARATOR . $hash;
+    
+    expect($hash_file)->not()->toBeFile();
+    expect($hash_file . '.owners')->not()->toBeDirectory();
+    expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
 
     list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', '/upload', upload_resource: $resource, authorization:['t' => 'upload', 'x' => $hash]);
     expect($status)->toBe('201');
     expect($headers['access-control-allow-origin'])->toBe('*');
     $blob_descriptor = json_decode($body);
+    
+    expect($hash_file)->toBeFile();
+    expect($hash_file . '.owners')->toBeDirectory();
+    expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->toBeFile();
     
     list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $blob_descriptor->sha256, authorization:['t' => 'get', 'x' => $hash]);
     expect($status)->toBe('200');
@@ -72,6 +95,11 @@ it('Servers MUST accept DELETE requests to the /<sha256> endpoint', function () 
     expect($status)->toBe('204');
     expect($headers['access-control-allow-origin'])->toBe('*');
     
+    expect($hash_file)->not()->toBeFile();
+    expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
+    expect(glob($hash_file . '.owners/*'))->toHaveCount(0);
+    expect($hash_file . '.owners')->not()->toBeDirectory();
+    
     list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $blob_descriptor->sha256, authorization:['t' => 'get', 'x' => $hash]);
     expect($status)->toBe('404');
     expect($headers['access-control-allow-origin'])->toBe('*');
@@ -79,4 +107,7 @@ it('Servers MUST accept DELETE requests to the /<sha256> endpoint', function () 
     list($protocol, $status, $headers, $body) = FeatureCase::request('DELETE', '/' . $blob_descriptor->sha256, authorization:['t' => 'delete', 'x' => $hash]);
     expect($status)->toBe('200');
     expect($headers['access-control-allow-origin'])->toBe('*');
-});
+    
+})->with([
+    [$contents = 'H3llo World!!!', hash('sha256', $contents)]
+]);

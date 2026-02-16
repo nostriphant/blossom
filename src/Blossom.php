@@ -25,8 +25,7 @@ readonly class Blossom implements \IteratorAggregate {
         $wrap = fn(string $endpoint_path, Endpoint $endpoint) => function(callable $define) use ($endpoint, $endpoint_path) : void {
             $endpoint_methods = [];
             $endpoint(function(HTTP\Method $method, callable $action_factory) use ($define, $endpoint_path, &$endpoint_methods) {
-                $define($method->name, $endpoint_path, new Authorization($action_factory, function(Endpoint\Action $action) : array {
-                    $response = $action();
+                $define($method->name, $endpoint_path, new Authorization($action_factory, function(array $response) : array {
                     $additional_headers = ['Access-Control-Allow-Origin' => '*'];
                     if (isset($response['body']) === false) {
                     } elseif(isset($headers['Content-Length']) === false) {
