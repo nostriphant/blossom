@@ -4,18 +4,17 @@ namespace nostriphant\Blossom\Endpoint;
 
 readonly class Blob implements \nostriphant\Blossom\Endpoint {
     
+    private Blob\Factory $factory;
     
-    public function __construct(private string $path) {
+    public function __construct(string $path) {
+        $this->factory = new Blob\Factory(fn(string $hash) => new \nostriphant\Blossom\Blob($path . DIRECTORY_SEPARATOR . $hash));
     }
     
     
     #[\Override]
     public function __invoke(callable $define) : void {
-        
-        $factory_factory = new Blob\Factory(fn(string $hash) => new \nostriphant\Blossom\Blob($this->path . DIRECTORY_SEPARATOR . $hash));
-        
-        $define(\nostriphant\Blossom\HTTP\Method::HEAD, $factory_factory(Blob\Get::class));
-        $define(\nostriphant\Blossom\HTTP\Method::GET, $factory_factory(Blob\Get::class));
-        $define(\nostriphant\Blossom\HTTP\Method::DELETE, $factory_factory(Blob\Delete::class));
+        $define(\nostriphant\Blossom\HTTP\Method::HEAD, ($this->factory)(Blob\Get::class));
+        $define(\nostriphant\Blossom\HTTP\Method::GET, ($this->factory)(Blob\Get::class));
+        $define(\nostriphant\Blossom\HTTP\Method::DELETE, ($this->factory)(Blob\Delete::class));
     }
 }
