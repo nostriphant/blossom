@@ -31,7 +31,7 @@ switch ($routeInfo[0]) {
     case FastRoute\Dispatcher::FOUND:
         $headers = array_filter($_SERVER, fn(string $key) => str_starts_with($key, 'HTTP_'), ARRAY_FILTER_USE_KEY);
         $response = $routeInfo[1](new \nostriphant\Blossom\ServerRequest($headers, $routeInfo[2], fopen('php://input', 'rb')));
-        error_log(var_Export($response, true));
+        
         header('HTTP/2 ' . ($response['status'] ?? '200'), true);
         
         $headers = $response['headers'] ?? [];

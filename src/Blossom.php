@@ -15,7 +15,7 @@ readonly class Blossom {
             $endpoint_methods = [];
             $endpoint_factory(function(Method $method, callable $handler) use ($define, $endpoint, $endpoint_factory, &$endpoint_methods) {
                 $define($method->name, $endpoint, fn(ServerRequest $request) => ((new Authorization(function(\nostriphant\NIP01\Event $authorization_event) use ($request, $endpoint_factory, $handler) : array {
-                    $response = $handler(...$endpoint_factory->attributes($request->attributes, fn() => $request()))($authorization_event);
+                    $response = $handler($request)($authorization_event);
 
                     $additional_headers = ['Access-Control-Allow-Origin' => '*'];
                     if (isset($response['body']) === false) {
