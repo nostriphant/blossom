@@ -40,10 +40,6 @@ readonly class Blossom {
         return $handler($authorization_event);
     }
     
-    static function authorization_middelware(Method $method, string $endpoint, callable $handler) : array {
-        return [$method->name, $endpoint, fn(?string $authorization = null) : callable  => self::authorize($authorization, $handler)];
-    }
-    
     static function wrap(string $endpoint, Endpoint\Factory $endpoint_factory) : callable {
         return function(callable $define) use ($endpoint_factory, $endpoint) : void {
             $endpoint_methods = [];
