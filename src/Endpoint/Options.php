@@ -4,8 +4,8 @@ namespace nostriphant\Blossom\Endpoint;
 
 readonly class Options {
     private array $methods;
-    public function __construct(\nostriphant\Blossom\Method ...$methods) {
-        $this->methods = array_map(fn(\nostriphant\Blossom\Method $method) => $method->name, $methods);
+    public function __construct(\nostriphant\Blossom\HTTP\Method ...$methods) {
+        $this->methods = array_map(fn(\nostriphant\Blossom\HTTP\Method $method) => $method->name, $methods);
     }
     
     public function __invoke() : array {
