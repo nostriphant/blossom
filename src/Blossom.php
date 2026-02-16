@@ -43,7 +43,6 @@ readonly class Blossom {
     static function authorization_middelware(Method $method, string $endpoint, callable $handler) : array {
         return [$method->name, $endpoint, function(?string $authorization = null) use ($method, $handler) : callable {
             return match($method) {
-                Method::OPTIONS => $handler,
                 default => self::authorize($authorization, $handler)
             };
         }];
