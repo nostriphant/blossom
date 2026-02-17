@@ -22,8 +22,20 @@ class Remote {
             'method' => 'GET',
             'header' => join("\r\n", $headers) . "\r\n"
         ]]));
+        
         if ($handle_remote === false) {
             return new \nostriphant\Blossom\Blob\Failed(500, 'Unable to open remote location.');
+        }
+        
+        foreach(http_get_last_response_headers() as $response_header) {
+            list($header, $value) = explode(':', $response_header, 2);
+            switch (strtolower($header)) {
+                case 'content-length':
+                    if (trim($value) > $this->max_file_size) {
+                        return new \nostriphant\Blossom\Blob\Failed(413, 'Filesize of remote file seems larger than max allowed file size.');
+                    }
+                    break;
+            }
         }
         
         $temp = tempnam($this->path, "buffer.");

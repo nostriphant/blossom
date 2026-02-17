@@ -26,7 +26,7 @@ readonly class Blossom implements \IteratorAggregate {
             $factory = Blob\Factory::recreate($factory, unsupported_media_types: $constraints->unsupported_content_types);
         }
         
-        return new self($this->server_key, $factory, function(string $pubkey_hex, int $content_length, string $content_type, callable $unauthorized) use ($constraints) : bool|array {
+        return new self($this->server_key, $factory, function(string $pubkey_hex, int $content_length, ?string $content_type, callable $unauthorized) use ($constraints) : bool|array {
             if (isset($constraints->allowed_pubkeys)) {
                 if (in_array($pubkey_hex, $constraints->allowed_pubkeys) === false) {
                     return $unauthorized(401, '');
@@ -39,7 +39,7 @@ readonly class Blossom implements \IteratorAggregate {
                 }
             }
             
-            if (isset($constraints->unsupported_content_types)) {
+            if (isset($constraints->unsupported_content_types) && isset($content_type)) {
                 if (in_array($content_type, $constraints->unsupported_content_types)) {
                     return $unauthorized(415, 'Unsupported file type.');
                 }

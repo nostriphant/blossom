@@ -86,9 +86,9 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
 ]);
 
 
-it('The /mirror endpoint fails on mirroring files larger than max file size', function () {
-    $contents = str_repeat('bbb', 100);
-    $hash = hash('sha256', $contents);
+it('The /mirror endpoint fails on mirroring files larger than max file size', function (string $contents, ?string $hash, ?int $content_length, ?string $content_type, string $expected_status, string $expected_reason) {
+    $hash ??= hash('sha256', $contents);
+    $content_length ??= strlen($contents);
     
     $blossom = FeatureCase::start_blossom('127.0.0.1:8088', FeatureCase::LOG_DIRECTORY . "/blossom-8088.log", FeatureCase::LOG_DIRECTORY . "/blossom-errors-8088.log");
     
@@ -100,7 +100,8 @@ it('The /mirror endpoint fails on mirroring files larger than max file size', fu
 
         $mirror_content = '{"url": "'.FeatureCase::RELAY_URL . '/' . $hash.'"}';
         list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', 'http://127.0.0.1:8088/mirror', upload_resource: $mirror_content, authorization:['t' => 'upload', 'x' => $hash]);
-        expect($status)->toBe('413');
+        expect($status)->toBe($expected_status, $body);
+        expect($headers['x-reason'])->toBe($expected_reason);
 
         clearstatcache();
         $hash_file = $blossom->files_directory . '/' . $hash;
@@ -113,4 +114,62 @@ it('The /mirror endpoint fails on mirroring files larger than max file size', fu
         throw $e;
     }
     $blossom();
-});
+})->with([
+    [str_repeat('bbb', 100), null, null, null, '413', 'Filesize of remote file seems larger than max allowed file size.'], 
+    
+]);
+//
+//
+//it('The PUT /upload endpoint MUST check content-type when existing', function () {
+//    $contents = str_repeat('ccc', 100);
+//    
+//    $resource = tmpfile();
+//    fwrite($resource, $contents);
+//    fseek($resource, 0);
+//    
+//    $hash = hash('sha256', $contents);
+//    $hash_file = FILES_DIRECTORY . DIRECTORY_SEPARATOR . $hash;
+//    
+//    expect($hash_file)->not()->toBeFile();
+//    expect($hash_file . '.owners')->not()->toBeDirectory();
+//    expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
+//    
+//    list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', '/upload', upload_resource: $resource, authorization:['t' => 'upload', 'x' => $hash], headers:[
+//        'Content-Type: text/plain',
+//        'Content-Length: ' . strlen($contents)
+//    ]);
+//    expect($status)->toBe('413');
+//    expect($headers['x-reason'])->toBe('File too large. Max allowed size is 100 bytes.');
+//
+//    expect($hash_file)->not()->toBeFile();
+//    expect($hash_file . '.owners')->not()->toBeDirectory();
+//    expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
+//});
+//
+//
+//it('The PUT /upload endpoint MUST check content-length when existing', function () {
+//    $contents = 'All right now!';
+//    
+//    $resource = tmpfile();
+//    fwrite($resource, $contents);
+//    fseek($resource, 0);
+//    
+//    $hash = hash('sha256', $contents);
+//    $hash_file = FILES_DIRECTORY . DIRECTORY_SEPARATOR . $hash;
+//    
+//    expect($hash_file)->not()->toBeFile();
+//    expect($hash_file . '.owners')->not()->toBeDirectory();
+//    expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
+//    
+//    
+//    list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', '/upload', upload_resource: $resource, authorization:['t' => 'upload', 'x' => $hash], headers:[
+//        'Content-Type: audio/wav',
+//        'Content-Length: ' . strlen($contents)
+//    ]);
+//    expect($status)->toBe('415');
+//    expect($headers['x-reason'])->toBe('Unsupported file type.');
+//
+//    expect($hash_file)->not()->toBeFile();
+//    expect($hash_file . '.owners')->not()->toBeDirectory();
+//    expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
+//});
