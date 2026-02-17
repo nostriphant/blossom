@@ -47,7 +47,7 @@ it('The HEAD /upload endpoint MUST use the X-SHA-256, X-Content-Type and X-Conte
     ]);
     expect($status)->toBe($response_status);
     if (isset($x_reason)) {
-        expect($headers)->toBe($x_reason);
+        expect($headers['x-reason'])->toBe($x_reason);
     } else {
         expect($headers)->not()->toHaveKey('x-reason');
     }
