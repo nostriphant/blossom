@@ -4,16 +4,19 @@ namespace nostriphant\Blossom\Endpoint\Upload;
 
 readonly class Put implements \nostriphant\Blossom\Endpoint\Action {
 
-    private Head $head;
+    private \Closure $upload_authorized;
     private \Closure $stream;
     
     public function __construct(callable $upload_authorized, private \nostriphant\Blossom\Blob\Uncreated $blob, callable $stream) {
+        $this->upload_authorized = \Closure::fromCallable($upload_authorized);
         $this->stream = \Closure::fromCallable($stream);
-        $this->head = new Head($upload_authorized, $blob, $stream);
     }
     
-    public function authorize(\nostriphant\NIP01\Event $authorization_event) : bool {
-        return $this->head->authorize($authorization_event);
+    public function authorize(\nostriphant\NIP01\Event $authorization_event, array $additional_headers, callable $action, callable $unauthorized) : array {
+        if (call_user_func($this->upload_authorized, $authorization_event->pubkey) === false) {
+            return $unauthorized(401, '');
+        }
+        return $action();
     }
     
     #[\Override]

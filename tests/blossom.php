@@ -12,6 +12,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     
     
     nostriphant\Functional\Functions::iterator_walk($blossom(fn(string $pubkey_hex) => in_array($pubkey_hex, explode(',', $_ENV['BLOSSOM_ALLOWED_PUBKEYS']))), fn(callable $route) => $route([$r, 'addRoute']));
+
 });
 
 // Fetch method and URI from somewhere

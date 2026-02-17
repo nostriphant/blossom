@@ -6,13 +6,13 @@ namespace nostriphant\Blossom\Endpoint\Blob;
 readonly class Get implements \nostriphant\Blossom\Endpoint\Action {
     public function __construct(private \nostriphant\Blossom\Blob $blob) {}
     
-    public function authorize(\nostriphant\NIP01\Event $authorization_event) : bool {
+    public function authorize(\nostriphant\NIP01\Event $authorization_event, array $additional_headers, callable $action, callable $unauthorized) : array {
         if (\nostriphant\NIP01\Event::hasTag($authorization_event, 'x') === false) {
-            return false;
+            return $unauthorized(401, '');
         } elseif (\nostriphant\NIP01\Event::extractTagValues($authorization_event, 'x')[0][0] !== $this->blob->sha256) {
-            return false;
+            return $unauthorized(401, '');
         }
-        return true;
+        return $action();
     }
     
     public function __invoke(string $pubkey_hex) : array {

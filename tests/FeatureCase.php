@@ -43,7 +43,8 @@ abstract class FeatureCase extends BaseTestCase
     
         $process = proc_open([PHP_BINARY, '-S', $socket, './tests/blossom.php'], $descriptorspec, $pipes, ROOT_DIR, [
             'BLOSSOM_ALLOWED_PUBKEYS' => '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f',
-            'FILES_DIRECTORY' => $files_directory
+            'FILES_DIRECTORY' => $files_directory,
+            'MAX_CONTENT_LENGTH' => 100
         ]);
 
         fclose($pipes[0]);

@@ -10,8 +10,8 @@ readonly class Put implements \nostriphant\Blossom\Endpoint\Action {
         $this->upload_authorized = \Closure::fromCallable($upload_authorized);
     }
 
-    public function authorize(\nostriphant\NIP01\Event $authorization_event): bool {
-        return call_user_func($this->upload_authorized, $authorization_event->pubkey);
+    public function authorize(\nostriphant\NIP01\Event $authorization_event, array $additional_headers, callable $action, callable $unauthorized) : array {
+        return call_user_func($this->upload_authorized, $authorization_event->pubkey) ? $action() : $unauthorized(401, '');
     }
 
     #[\Override]
