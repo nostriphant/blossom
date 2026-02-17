@@ -42,7 +42,7 @@ readonly class Blossom implements \IteratorAggregate {
             $define('OPTIONS', $endpoint_path, fn(HTTP\ServerRequest $request) => (new Endpoint\Action\Options(...iterator_to_array($endpoint_methods)))());
         };
         
-        yield $wrap('/{hash:' . str_repeat('\\w', 64) . '}[.{ext:\w+}]', new Endpoint\Blob($this->factory));
+        yield $wrap('/{hash:\w{64}}[.{ext:\w+}]', new Endpoint\Blob($this->factory));
         yield $wrap('/upload', new Endpoint\Upload($this->factory, $this->upload_authorized));
         yield $wrap('/mirror', new Endpoint\Mirror($this->factory, $this->server_key, $this->upload_authorized));
     }
