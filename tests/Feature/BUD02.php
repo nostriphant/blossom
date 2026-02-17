@@ -136,15 +136,17 @@ it('The PUT /upload endpoint MUST check content-length when existing', function 
         'Content-Length: ' . strlen($contents)
     ]);
     expect($status)->toBe('415');
-    expect($headers['x-reason'])->toBe('Unsupported file type.');
+    expect($headers['x-reason'])->toBe('Unsupported file type "audio/wav".');
 
     expect($hash_file)->not()->toBeFile();
     expect($hash_file . '.owners')->not()->toBeDirectory();
     expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
 });
 
-it('Servers MUST accept DELETE requests to the /<sha256> endpoint', function (string $contents, string $hash) {
-
+it('Servers MUST accept DELETE requests to the /<sha256> endpoint', function () {
+    $contents = 'H3llo World!!!';
+    $hash = hash('sha256', $contents);
+        
     $resource = tmpfile();
     fwrite($resource, $contents);
     fseek($resource, 0);
@@ -175,6 +177,7 @@ it('Servers MUST accept DELETE requests to the /<sha256> endpoint', function (st
     expect($status)->toBe('204');
     expect($headers['access-control-allow-origin'])->toBe('*');
     
+    clearstatcache();
     expect($hash_file)->not()->toBeFile();
     expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
     expect(glob($hash_file . '.owners/*'))->toHaveCount(0);
@@ -188,6 +191,4 @@ it('Servers MUST accept DELETE requests to the /<sha256> endpoint', function (st
     expect($status)->toBe('200');
     expect($headers['access-control-allow-origin'])->toBe('*');
     
-})->with([
-    [$contents = 'H3llo World!!!', hash('sha256', $contents)]
-]);
+});

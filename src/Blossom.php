@@ -13,20 +13,33 @@ readonly class Blossom implements \IteratorAggregate {
     }
     
     static function fromPath(\nostriphant\NIP01\Key $server_key, string $path) : self {
-        return new self($server_key, new Blob\Factory($path, null, []), fn(string $pubkey_hex) => true);
+        return new self($server_key, new Blob\Factory($path, null, fn() => true), fn(string $pubkey_hex) => true);
     }
     
     public function __invoke(UploadConstraints $constraints): self {
-        
         $factory = $this->factory;
         if (isset($constraints->max_upload_size)) {
             $factory = Blob\Factory::recreate($factory, max_file_size: $constraints->max_upload_size);
         }
-        if (isset($constraints->unsupported_content_types)) {
-            $factory = Blob\Factory::recreate($factory, unsupported_media_types: $constraints->unsupported_content_types);
-        }
+        $unsupported_type_checker = function(string $content_type) use ($constraints) {
+            if (isset($constraints->unsupported_content_types) === false) {
+                return false;
+            } elseif (in_array($content_type, $constraints->unsupported_content_types)) {
+                return true;
+            }
+
+            foreach (array_filter($constraints->unsupported_content_types, fn(string $unsupported_content_type) => str_ends_with($unsupported_content_type, '/*')) as $unsupported_content_type) {
+                list($category, $type) = explode('/', $unsupported_content_type, 2);
+                if (str_starts_with($content_type, $category . '/')) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        $factory = Blob\Factory::recreate($factory, unsupported_media_types: $unsupported_type_checker);
         
-        return new self($this->server_key, $factory, function(string $pubkey_hex, int $content_length, ?string $content_type, callable $unauthorized) use ($constraints) : bool|array {
+        return new self($this->server_key, $factory, function(string $pubkey_hex, int $content_length, ?string $content_type, callable $unauthorized) use ($constraints, $unsupported_type_checker) : bool|array {
             if (isset($constraints->allowed_pubkeys)) {
                 if (in_array($pubkey_hex, $constraints->allowed_pubkeys) === false) {
                     return $unauthorized(401, '');
@@ -40,15 +53,8 @@ readonly class Blossom implements \IteratorAggregate {
             }
             
             if (isset($constraints->unsupported_content_types) && isset($content_type)) {
-                if (in_array($content_type, $constraints->unsupported_content_types)) {
-                    return $unauthorized(415, 'Unsupported file type.');
-                }
-                
-                foreach (array_filter($constraints->unsupported_content_types, fn(string $unsupported_content_type) => str_ends_with($unsupported_content_type, '/*')) as $unsupported_content_type) {
-                    list($category, $type) = explode('/', $unsupported_content_type, 2);
-                    if (str_starts_with($content_type, $category . '/')) {
-                        return $unauthorized(415, 'Unsupported file type.');
-                    }
+                if ($unsupported_type_checker($content_type)) {
+                    return $unauthorized(415, 'Unsupported file type "' . $content_type . '".');
                 }
             }
             return true;

@@ -25,7 +25,7 @@ describe("OPTIONS /mirror", function() {
     });
 });
 
-it('The /mirror endpoint MUST download the blob from the specified URL and verify that there is at least one x tag in the authorization event matching the sha256 hash of the download blob', function (string $contents, string $hash) {
+it('The /mirror endpoint MUST download the blob from the specified URL and verify that there is at least one x tag in the authorization event matching the sha256 hash of the download blob', function (string $contents, ?string $hash) {
 
     $blossom = FeatureCase::start_blossom('127.0.0.1:8088', FeatureCase::LOG_DIRECTORY . "/blossom-8088.log", FeatureCase::LOG_DIRECTORY . "/blossom-errors-8088.log");
     
@@ -34,27 +34,28 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         fwrite($resource, $contents);
         fseek($resource, 0);
 
+        $hash ??= hash('sha256', $contents);
         $hash_file = $blossom->files_directory . DIRECTORY_SEPARATOR . $hash;
 
         list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', '/upload', upload_resource: $resource, authorization:['t' => 'upload', 'x' => $hash]);
         expect($status)->toBe('201');
 
-        $expected_hash = hash('sha256', 'Hello World!!!');
+        $expected_hash = hash('sha256', $contents);
         $blob_descriptor = json_decode($body);
         expect($blob_descriptor->url)->toBe(FeatureCase::RELAY_URL . '/' . $expected_hash);
         expect($blob_descriptor->sha256)->toBe($expected_hash);
-        expect($blob_descriptor->size)->toBe(14);
+        expect($blob_descriptor->size)->toBe(strlen($contents));
         expect($blob_descriptor->type)->toBe('text/plain');
         expect($blob_descriptor->uploaded)->toBeInt();
 
         $mirror_content = '{"url": "'.$blob_descriptor->url.'"}';
         list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', 'http://127.0.0.1:8088/mirror', upload_resource: $mirror_content, authorization:['t' => 'upload', 'x' => $hash]);
-        expect($status)->toBe('201');
+        expect($status)->toBe('201', $headers['x-reason'] ?? '');
         
         $blob_descriptor = json_decode($body);
         expect($blob_descriptor->url)->toBe(FeatureCase::RELAY_URL . '/' . $expected_hash);
         expect($blob_descriptor->sha256)->toBe($expected_hash);
-        expect($blob_descriptor->size)->toBe(14);
+        expect($blob_descriptor->size)->toBe(strlen($contents));
         expect($blob_descriptor->type)->toBe('text/plain');
         expect($blob_descriptor->uploaded)->toBeInt();
 
@@ -82,7 +83,7 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
     }
     $blossom();
 })->with([
-    [$contents = 'Hello World!!!', hash('sha256', $contents)]
+    [$contents = 'Hello Wddorld!!!', null]
 ]);
 
 

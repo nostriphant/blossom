@@ -66,6 +66,6 @@ it('The HEAD /upload endpoint MUST use headers sent by client', function (string
 })->with([
     ['Heldlo World!!!', null, null, null, '200'],
     ['Heldlo World!!!', null, 1024 ^ 8, null, '413', 'File too large. Max allowed size is 100 bytes.'],
-    ['Heldlo World!!!', null, null, 'video/x-msvideo', '415', 'Unsupported file type.'],
-    ['Heldlo World!!!', null, null, 'audio/midi', '415', 'Unsupported file type.']
+    ['Heldlo World!!!', null, null, 'video/x-msvideo', '415', 'Unsupported file type "video/x-msvideo".'],
+    ['Heldlo World!!!', null, null, 'audio/midi', '415', 'Unsupported file type "audio/midi".']
 ]);

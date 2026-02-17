@@ -4,8 +4,11 @@ namespace nostriphant\Blossom\Blob;
 
 
 class Remote {
-    public function __construct(private string $path, private ?int $max_file_size, private array $unsupported_media_types) {
-        
+    
+    private \Closure $unsupported_media_types;
+    
+    public function __construct(private string $path, private ?int $max_file_size, callable $unsupported_media_types) {
+        $this->unsupported_media_types = \Closure::fromCallable($unsupported_media_types);
     }
     
     public function __invoke(string $pubkey_hex, \nostriphant\NIP01\Key $server_key, string $url): \nostriphant\Blossom\Blob {
@@ -31,8 +34,14 @@ class Remote {
             list($header, $value) = explode(':', $response_header, 2);
             switch (strtolower($header)) {
                 case 'content-length':
-                    if (trim($value) > $this->max_file_size) {
+                    if ($value > $this->max_file_size) {
                         return new \nostriphant\Blossom\Blob\Failed(413, 'Filesize of remote file seems larger than max allowed file size.');
+                    }
+                    break;
+                case 'content-type':
+                    list($value,) = explode(';', trim($value));
+                    if (call_user_func($this->unsupported_media_types, $value)) {
+                        return new \nostriphant\Blossom\Blob\Failed(415, 'Unsupported file type "' . $value . '".');
                     }
                     break;
             }

@@ -4,8 +4,11 @@ namespace nostriphant\Blossom\Blob;
 
 
 class Uncreated {
-    public function __construct(private string $path, private ?int $max_file_size, private array $unsupported_media_types) {
-        
+    
+    private \Closure $unsupported_media_types;
+    
+    public function __construct(private string $path, private ?int $max_file_size, callable $unsupported_media_types) {
+        $this->unsupported_media_types = \Closure::fromCallable($unsupported_media_types);
     }
     
     public function __invoke(string $pubkey_hex, callable $stream): \nostriphant\Blossom\Blob {
