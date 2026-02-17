@@ -13,7 +13,8 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     
     nostriphant\Functional\Functions::iterator_walk($blossom(new \nostriphant\Blossom\UploadConstraints(
             explode(',', $_ENV['BLOSSOM_ALLOWED_PUBKEYS']),
-            $_ENV['MAX_CONTENT_LENGTH']
+            $_ENV['MAX_CONTENT_LENGTH'],
+            ['video/x-msvideo', 'audio/*']
     )), fn(callable $route) => $route([$r, 'addRoute']));
 
 });

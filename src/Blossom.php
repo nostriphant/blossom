@@ -35,6 +35,19 @@ readonly class Blossom implements \IteratorAggregate {
                     return $unauthorized(413, 'File too large. Max allowed size is '.$constraints->max_upload_size.' bytes.');
                 }
             }
+            
+            if (isset($constraints->unsupported_content_types) && isset($additional_headers['X_CONTENT_TYPE'])) {
+                if (in_array($additional_headers['X_CONTENT_TYPE'], $constraints->unsupported_content_types)) {
+                    return $unauthorized(415, 'Unsupported file type.');
+                }
+                
+                foreach (array_filter($constraints->unsupported_content_types, fn(string $unsupported_content_type) => str_ends_with($unsupported_content_type, '/*')) as $unsupported_content_type) {
+                    list($category, $type) = explode('/', $unsupported_content_type, 2);
+                    if (str_starts_with($additional_headers['X_CONTENT_TYPE'], $category . '/')) {
+                        return $unauthorized(415, 'Unsupported file type.');
+                    }
+                }
+            }
             return true;
         });
     }

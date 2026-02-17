@@ -37,9 +37,10 @@ it('The HEAD /upload endpoint MUST use the X-SHA-256, X-Content-Type and X-Conte
     expect($status)->toBe('400');
 });
 
-it('The HEAD /upload endpoint MUST use the X-SHA-256, X-Content-Type and X-Content-Length headers sent by client', function (string $contents, ?string $hash, ?int $content_length, string $response_status, ?string $x_reason = null) {
+it('The HEAD /upload endpoint MUST use headers sent by client', function (string $contents, ?string $hash, ?int $content_length, ?string $content_type, string $response_status, ?string $x_reason = null) {
     $hash ??= hash('sha256', $contents);
     $content_length ??= strlen($contents);
+    $content_type ??= 'text/plain';
     
     $resource = tmpfile();
     fwrite($resource, $contents);
@@ -52,7 +53,7 @@ it('The HEAD /upload endpoint MUST use the X-SHA-256, X-Content-Type and X-Conte
     expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
     
     list($protocol, $status, $headers, $body) = FeatureCase::request('HEAD', '/upload', upload_resource: $resource, authorization:['t' => 'upload', 'x' => $hash], headers: [
-        'X-Content-Type: text/plain',
+        'X-Content-Type: ' . $content_type,
         'X-Content-Length: ' . $content_length,
         'X-SHA-256: ' . $hash
     ]);
@@ -63,6 +64,8 @@ it('The HEAD /upload endpoint MUST use the X-SHA-256, X-Content-Type and X-Conte
         expect($headers)->not()->toHaveKey('x-reason');
     }
 })->with([
-    ['Heldlo World!!!', null, null, '200'],
-    ['Heldlo World!!!', null, 1024 ^ 8, '413', 'File too large. Max allowed size is 100 bytes.']
+    ['Heldlo World!!!', null, null, null, '200'],
+    ['Heldlo World!!!', null, 1024 ^ 8, null, '413', 'File too large. Max allowed size is 100 bytes.'],
+    ['Heldlo World!!!', null, null, 'video/x-msvideo', '415', 'Unsupported file type.'],
+    ['Heldlo World!!!', null, null, 'audio/midi', '415', 'Unsupported file type.']
 ]);
