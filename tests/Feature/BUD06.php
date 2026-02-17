@@ -22,8 +22,10 @@ describe("OPTIONS /upload", function() {
     });
 });
 
-it('The HEAD /upload endpoint MUST use the X-SHA-256, X-Content-Type and X-Content-Length headers sent by client', function (string $contents, string $hash, string $response_status, ?string $x_reason = null) {
+it('The HEAD /upload endpoint MUST use the X-SHA-256, X-Content-Type and X-Content-Length headers sent by client', function (string $contents, ?string $hash, string $response_status, ?string $x_reason = null) {
 
+    $hash ??= hash('sha256', $contents);
+    
     $resource = tmpfile();
     fwrite($resource, $contents);
     fseek($resource, 0);
@@ -50,5 +52,5 @@ it('The HEAD /upload endpoint MUST use the X-SHA-256, X-Content-Type and X-Conte
         expect($headers)->not()->toHaveKey('x-reason');
     }
 })->with([
-    [$contents = 'Heldlo World!!!', hash('sha256', $contents), '200']
+    ['Heldlo World!!!', null, '200']
 ]);
