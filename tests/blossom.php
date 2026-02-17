@@ -11,7 +11,10 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $blossom = \nostriphant\Blossom\Blossom::fromPath($server_key, \nostriphant\BlossomTests\files_directory());
     
     
-    nostriphant\Functional\Functions::iterator_walk($blossom(fn(string $pubkey_hex) => in_array($pubkey_hex, explode(',', $_ENV['BLOSSOM_ALLOWED_PUBKEYS']))), fn(callable $route) => $route([$r, 'addRoute']));
+    nostriphant\Functional\Functions::iterator_walk($blossom(new \nostriphant\Blossom\UploadConstraints(
+            explode(',', $_ENV['BLOSSOM_ALLOWED_PUBKEYS']),
+            $_ENV['MAX_CONTENT_LENGTH']
+    )), fn(callable $route) => $route([$r, 'addRoute']));
 
 });
 

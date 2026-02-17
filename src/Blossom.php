@@ -16,8 +16,21 @@ readonly class Blossom implements \IteratorAggregate {
         return new self($server_key, new Blob\Factory($path), fn(string $pubkey_hex) => true);
     }
     
-    public function __invoke(callable $upload_authorized): self {
-        return new self($this->server_key, $this->factory, $upload_authorized);
+    public function __invoke(UploadConstraints $constraints): self {
+        return new self($this->server_key, $this->factory, function(string $pubkey_hex, array $additional_headers, callable $unauthorized) use ($constraints) : bool|array {
+            if (isset($constraints->allowed_pubkeys)) {
+                if (in_array($pubkey_hex, $constraints->allowed_pubkeys) === false) {
+                    return $unauthorized(401, '');
+                }
+            }
+        
+            if (isset($constraints->max_upload_size) && isset($additional_headers['X_CONTENT_LENGTH'])) {
+                if ($additional_headers['X_CONTENT_LENGTH'] > $constraints->max_upload_size) {
+                    return $unauthorized(413, 'File too large. Max allowed size is '.$constraints->max_upload_size.' bytes.');
+                }
+            }
+            return true;
+        });
     }
 
     #[\Override]
