@@ -84,3 +84,33 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
 })->with([
     [$contents = 'Hello World!!!', hash('sha256', $contents)]
 ]);
+
+
+it('The /mirror endpoint fails on mirroring files larger than max file size', function () {
+    $contents = str_repeat('bbb', 100);
+    $hash = hash('sha256', $contents);
+    
+    $blossom = FeatureCase::start_blossom('127.0.0.1:8088', FeatureCase::LOG_DIRECTORY . "/blossom-8088.log", FeatureCase::LOG_DIRECTORY . "/blossom-errors-8088.log");
+    
+    try {
+        $hash_original_file = FILES_DIRECTORY . DIRECTORY_SEPARATOR . $hash;
+        file_put_contents($hash_original_file, $contents);
+        is_dir($hash_original_file . '.owners') || mkdir($hash_original_file . '.owners');
+        touch($hash_original_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f');
+
+        $mirror_content = '{"url": "'.FeatureCase::RELAY_URL . '/' . $hash.'"}';
+        list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', 'http://127.0.0.1:8088/mirror', upload_resource: $mirror_content, authorization:['t' => 'upload', 'x' => $hash]);
+        expect($status)->toBe('413');
+
+        clearstatcache();
+        $hash_file = $blossom->files_directory . '/' . $hash;
+        expect($hash_file)->not()->toBeFile();
+        expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
+        expect(glob($hash_file . '.owners/*'))->toHaveCount(0);
+        expect($hash_file . '.owners')->not()->toBeDirectory();
+    } catch (\Exception $e) {
+        $blossom(false);
+        throw $e;
+    }
+    $blossom();
+});

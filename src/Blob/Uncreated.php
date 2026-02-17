@@ -13,20 +13,15 @@ class Uncreated {
         
         $written = 0;
         $handle = fopen($temp, 'wb');
-        $failed = false;
         foreach ($stream() as $buffer) {
             $written += fwrite($handle, $buffer);
             if ($written > $this->max_file_size) {
-                $failed = [413, 'Filesize larger than max file size.'];
-                break;
+                fclose($handle);
+                unlink($temp);
+                return new \nostriphant\Blossom\Blob\Failed(413, 'Filesize larger than max allowed file size.');
             }
         }
         fclose($handle);
-        
-        if ($failed !== false) {
-            unlink($temp);
-            return new \nostriphant\Blossom\Blob\Failed(...$failed);
-        }
         
         $target_location = $this->path . DIRECTORY_SEPARATOR . hash_file('sha256', $temp);
         if (file_exists($target_location) === false) {

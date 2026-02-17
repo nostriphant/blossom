@@ -23,15 +23,21 @@ class Remote {
             'header' => join("\r\n", $headers) . "\r\n"
         ]]));
         if ($handle_remote === false) {
-            return new \nostriphant\Blossom\Blob('failed');
+            return new \nostriphant\Blossom\Blob\Failed(500, 'Unable to open remote location.');
         }
         
         $temp = tempnam($this->path, "buffer.");
         
+        $written = 0;
         $handle = fopen($temp, 'wb');
         while (feof($handle_remote) === false) {
             $chunk = fread($handle_remote, 1024);
-            fwrite($handle, $chunk);
+            $written += fwrite($handle, $chunk);
+            if ($written > $this->max_file_size) {
+                fclose($handle);
+                unlink($temp);
+                return new \nostriphant\Blossom\Blob\Failed(413, 'Filesize of remote file larger than max allowed file size.');
+            }
         }
         fclose($handle_remote);
         fclose($handle);

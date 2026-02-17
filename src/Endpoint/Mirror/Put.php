@@ -27,10 +27,6 @@ readonly class Put implements \nostriphant\Blossom\Endpoint\Action {
         }
         
         $blob = ($this->blob)($pubkey_hex, $this->server_key, $json->url);
-        if ($blob->exists === false) {
-            return ['status' => 500];
-        }
-
         return $blob();
     }
 }
