@@ -7,38 +7,38 @@ use \nostriphant\BlossomTests\FeatureCase;
     
 describe("OPTIONS /<sha-256>", function() {
     it('For preflight (OPTIONS) requests, servers MUST also set, at minimum, the Access-Control-Allow-Headers: Authorization, * and Access-Control-Allow-Methods: GET, HEAD headers.', function () {
-        $hash = FeatureCase::writeFile('Hello World!');
+        $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!');
         list($protocol, $status, $headers, $body) = FeatureCase::request('OPTIONS', '/' . $hash);
         expect($status)->toBe('204');
         expect($headers['access-control-allow-origin'])->toBe('Authorization, *');
         expect(explode(', ', $headers['access-control-allow-methods']))->toContain('GET', 'HEAD');
         expect($body)->toBeEmpty();
         
-        FeatureCase::deleteFile($hash);
+        \nostriphant\Blossom\deleteFile(FILES_DIRECTORY, $hash);
     });
 
     it('Allow for extensions', function () {
-        $hash = FeatureCase::writeFile('Hello World!');
+        $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!');
         list($protocol, $status, $headers, $body) = FeatureCase::request('OPTIONS', '/' . $hash . '.txt');
         expect($status)->toBe('204');
         expect($headers['access-control-allow-origin'])->toBe('Authorization, *');
         expect(explode(', ', $headers['access-control-allow-methods']))->toContain('GET', 'HEAD');
         expect($body)->toBeEmpty();
         
-        FeatureCase::deleteFile($hash);
+        \nostriphant\Blossom\deleteFile(FILES_DIRECTORY, $hash);
     });
 
     it('The header Access-Control-Max-Age: 86400 MAY be set to cache the results of a preflight request for 24 hours.', function () {
-        $hash = FeatureCase::writeFile('Hello World!');
+        $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!');
         list($protocol, $status, $headers, $body) = FeatureCase::request('OPTIONS', '/' . $hash);
         expect($headers['access-control-max-age'])->toBe('86400');
         
-        FeatureCase::deleteFile($hash);
+        \nostriphant\Blossom\deleteFile(FILES_DIRECTORY, $hash);
     });
 });
 
 it('GET /<sha-256> without authorizations fails with 401', function () {
-    $hash = FeatureCase::writeFile('Hello World!');
+    $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!');
     list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $hash);
     expect($status)->toBe('401');
     list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $hash, authorization: ['x' => $hash]);
@@ -52,47 +52,47 @@ it('GET /<sha-256> without authorizations fails with 401', function () {
     list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $hash, authorization: ['t' => 'get', 'x' => 'sdfkjhsdkfjhsdkjf']);
     expect($status)->toBe('401');
         
-    FeatureCase::deleteFile($hash);
+    \nostriphant\Blossom\deleteFile(FILES_DIRECTORY, $hash);
 });
 
 it('GET /<sha-256>', function () {
-    $hash = FeatureCase::writeFile('Hello World!');
+    $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!');
     list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $hash, authorization: ['t' => 'get', 'x' => $hash]);
     expect($status)->toBe('200');
     expect($headers['content-type'])->toContain('text/plain');
     expect($headers['access-control-allow-origin'])->toBe('*');
     expect($body)->toBe('Hello World!');
-    FeatureCase::deleteFile($hash);
+    \nostriphant\Blossom\deleteFile(FILES_DIRECTORY, $hash);
 });
 
 it('GET /<sha-256>.txt', function () {
-    $hash = FeatureCase::writeFile('Hello World!');
+    $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!');
     list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $hash . '.txt', authorization: ['t' => 'get', 'x' => $hash]);
     expect($status)->toBe('200');
     expect($headers['content-type'])->toContain('text/plain');
     expect($headers['access-control-allow-origin'])->toBe('*');
     expect($body)->toBe('Hello World!');
-    FeatureCase::deleteFile($hash);
+    \nostriphant\Blossom\deleteFile(FILES_DIRECTORY, $hash);
 });
 
 it('HEAD /<sha-256>', function () {
-    $hash = FeatureCase::writeFile('Hello World!');
+    $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!');
     list($protocol, $status, $headers, $body) = FeatureCase::request('HEAD', '/' . $hash, authorization: ['t' => 'get', 'x' => $hash]);
     expect($status)->toBe('200');
     expect($headers['content-type'])->toContain('text/plain');
     expect($headers['access-control-allow-origin'])->toBe('*');
     expect($body)->toBeEmpty();
-    FeatureCase::deleteFile($hash);
+    \nostriphant\Blossom\deleteFile(FILES_DIRECTORY, $hash);
 });
 
 it('HEAD /<sha-256>.txt', function () {
-    $hash = FeatureCase::writeFile('Hello World!');
+    $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!');
     list($protocol, $status, $headers, $body) = FeatureCase::request('HEAD', '/' . $hash . '.txt', authorization: ['t' => 'get', 'x' => $hash]);
     expect($status)->toBe('200');
     expect($headers['content-type'])->toContain('text/plain');
     expect($headers['access-control-allow-origin'])->toBe('*');
     expect($body)->toBeEmpty();
-    FeatureCase::deleteFile($hash);
+    \nostriphant\Blossom\deleteFile(FILES_DIRECTORY, $hash);
 });
 
 it('responds with 404 when file missing', function () {

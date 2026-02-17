@@ -9,14 +9,9 @@ abstract class FeatureCase extends BaseTestCase
     const SOCKET = '127.0.0.1:8087';
     const RELAY_URL = 'http://' . self::SOCKET;
     const LOG_DIRECTORY = ROOT_DIR . "/logs";
-    const LOG_OUTPUT = self::LOG_DIRECTORY . "/blossom.log";
-    const LOG_ERRORS = self::LOG_DIRECTORY . "/blossom-errors.log";
     
-    static public $process;
-    static public $runners = 0;
-        
     static function request(string $method, string $path, $upload_resource = null, ?array $authorization = null) : array {
-        return \nostriphant\Blossom\request($method, self::RELAY_URL . $path, $upload_resource, $authorization);
+        return \nostriphant\Blossom\request($method, str_starts_with($path, 'http') ? $path : self::RELAY_URL . $path, $upload_resource, $authorization);
     }
     
     static function writeFile(string $content) : string {
@@ -33,4 +28,43 @@ abstract class FeatureCase extends BaseTestCase
         expect($directory . DIRECTORY_SEPARATOR . $hash)->not()->toBeFile();
         return $result;
     }
+    
+    static function start_blossom(string $socket, string $output = self::LOG_DIRECTORY . "/blossom.log", string $errors = self::LOG_DIRECTORY . "/blossom-errors.log") {
+        $descriptorspec = [
+            0 => ["pipe", "r"],  
+            1 => ["file", $output, "w"], 
+            2 => ["file", $errors, "w"]
+        ];
+        
+        list($host, $port) = explode(':', $socket, 2);
+        $files_directory = 'files-' . $port;
+        $files_path = \nostriphant\Blossom\data_directory() . DIRECTORY_SEPARATOR . $files_directory;
+        is_dir($files_path) || mkdir($files_path);
+    
+        $process = proc_open([PHP_BINARY, '-S', $socket, './tests/blossom.php'], $descriptorspec, $pipes, ROOT_DIR, [
+            'BLOSSOM_ALLOWED_PUBKEYS' => '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f',
+            'FILES_DIRECTORY' => $files_directory
+        ]);
+
+        fclose($pipes[0]);
+
+        while (str_contains(file_get_contents($errors), 'Development Server (http://' . $socket . ') started') === false){ }
+        
+        return new class($files_path, $process) {
+            
+            public function __construct(public string $files_directory, private $process) {
+            
+            }
+            
+            public function __invoke() {
+                proc_terminate($this->process);
+                sleep(1);
+                proc_close($this->process);
+                
+                destroy_directories($this->files_directory);
+                return is_dir($this->files_directory) && rmdir($this->files_directory);
+            }
+        };
+    }
+    
 }

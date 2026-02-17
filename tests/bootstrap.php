@@ -6,7 +6,7 @@ use function \nostriphant\Blossom\data_directory;
 require_once dirname(__DIR__) . '/bootstrap.php';
 
 function files_directory() {
-    return data_directory() . '/files';
+    return \nostriphant\Blossom\data_directory() . '/' . ($_ENV['FILES_DIRECTORY'] ?? 'files');
 }
 function make_files_directory() {
     return \nostriphant\Blossom\make_data_directory() && (is_dir(files_directory()) || mkdir(files_directory()));

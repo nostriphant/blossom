@@ -7,7 +7,7 @@ use \nostriphant\BlossomTests\FeatureCase;
     
 describe("OPTIONS /upload", function() {
     it('For preflight (OPTIONS) requests, servers MUST also set, at minimum, the Access-Control-Allow-Headers: Authorization, * and Access-Control-Allow-Methods: PUT headers.', function () {
-        $hash = FeatureCase::writeFile('Hello World!');
+        $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!');
         list($protocol, $status, $headers, $body) = FeatureCase::request('OPTIONS', '/upload');
         expect($status)->toBe('204');
         expect($headers['access-control-allow-origin'])->toBe('Authorization, *');
@@ -16,7 +16,7 @@ describe("OPTIONS /upload", function() {
     });
 
     it('The header Access-Control-Max-Age: 86400 MAY be set to cache the results of a preflight request for 24 hours.', function () {
-        $hash = FeatureCase::writeFile('Hello World!');
+        $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!');
         list($protocol, $status, $headers, $body) = FeatureCase::request('OPTIONS', '/upload');
         expect($headers['access-control-max-age'])->toBe('86400');
     });
@@ -28,7 +28,7 @@ it('The PUT /upload endpoint MUST accept binary data in the body of the request'
     fwrite($resource, $contents);
     fseek($resource, 0);
     
-    $hash_file = \nostriphant\BlossomTests\files_directory() . DIRECTORY_SEPARATOR . $hash;
+    $hash_file = FILES_DIRECTORY . DIRECTORY_SEPARATOR . $hash;
     
     list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', '/upload', upload_resource: tmpfile(), authorization:['t' => 'upload', 'x' => $hash, 'key' => '6eeb5ad99e47115467d096e07c1c9b8b41768ab53465703f78017204adc5b0cc']);
     expect($status)->toBe('401');
@@ -72,7 +72,7 @@ it('Servers MUST accept DELETE requests to the /<sha256> endpoint', function (st
     fwrite($resource, $contents);
     fseek($resource, 0);
     
-    $hash_file = \nostriphant\BlossomTests\files_directory() . DIRECTORY_SEPARATOR . $hash;
+    $hash_file = FILES_DIRECTORY . DIRECTORY_SEPARATOR . $hash;
     
     expect($hash_file)->not()->toBeFile();
     expect($hash_file . '.owners')->not()->toBeDirectory();

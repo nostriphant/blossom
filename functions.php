@@ -9,21 +9,27 @@ function request(string $method, string $uri, $upload_resource = null, ?array $a
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_HEADER, true);
     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+    
+    $headers = [];
     switch ($method) {
         case 'HEAD':
             curl_setopt($curl, CURLOPT_NOBODY, true);
             break;
         case 'PUT':
             curl_setopt($curl, CURLOPT_UPLOAD, 1);
-            curl_setopt($curl, CURLOPT_READDATA, $upload_resource);
-            curl_setopt($curl, CURLOPT_READFUNCTION, fn($ch, $fh, int $length) => fread($fh, $length));
+            if (is_string($upload_resource)) {
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $upload_resource);
+                $headers[] = 'Content-Type:application/json';
+            } else {
+                curl_setopt($curl, CURLOPT_READDATA, $upload_resource);
+                curl_setopt($curl, CURLOPT_READFUNCTION, fn($ch, $fh, int $length) => fread($fh, $length));
+            }
             break;
         default:
             break;
 
     }
     
-    $headers = [];
     if (isset($authorization)) {
         $sender_key = Key::fromHex($authorization['key'] ?? 'a71a415936f2dd70b777e5204c57e0df9a6dffef91b3c78c1aa24e54772e33c3');
         unset($authorization['key']);
