@@ -56,13 +56,15 @@ abstract class FeatureCase extends BaseTestCase
             
             }
             
-            public function __invoke() {
+            public function __invoke($remove_files = true) {
                 proc_terminate($this->process);
                 sleep(1);
                 proc_close($this->process);
                 
-                destroy_directories($this->files_directory);
-                return is_dir($this->files_directory) && rmdir($this->files_directory);
+                if ($remove_files) {
+                    destroy_directories($this->files_directory);
+                    return is_dir($this->files_directory) && rmdir($this->files_directory);
+                }
             }
         };
     }

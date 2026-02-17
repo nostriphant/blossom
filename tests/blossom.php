@@ -6,7 +6,10 @@ $dotenv = Dotenv\Dotenv::createMutable(__DIR__);
 $dotenv->safeLoad();
 
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) { 
-    $blossom = \nostriphant\Blossom\Blossom::fromPath(\nostriphant\BlossomTests\files_directory());
+    $server_key = nostriphant\NIP01\Key::generate();
+    
+    $blossom = \nostriphant\Blossom\Blossom::fromPath($server_key, \nostriphant\BlossomTests\files_directory());
+    
     
     nostriphant\Functional\Functions::iterator_walk($blossom(fn(string $pubkey_hex) => in_array($pubkey_hex, explode(',', $_ENV['BLOSSOM_ALLOWED_PUBKEYS']))), fn(callable $route) => $route([$r, 'addRoute']));
 });
@@ -23,18 +26,20 @@ if (false !== $pos = strpos($uri, '?')) {
 $routeInfo = $dispatcher->dispatch($httpMethod, rawurldecode($uri));
 switch ($routeInfo[0]) {
     case FastRoute\Dispatcher::NOT_FOUND:
-        header('HTTP/2 404', true);
+        header('HTTP/1.1 404', true);
         break;
     case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
         $allowedMethods = $routeInfo[1];
         // ... 405 Method Not Allowed
-        header('HTTP/2 405', true);
+        header('HTTP/1.1 405', true);
         break;
     case FastRoute\Dispatcher::FOUND:
         $headers = array_filter($_SERVER, fn(string $key) => str_starts_with($key, 'HTTP_'), ARRAY_FILTER_USE_KEY);
-        $response = $routeInfo[1](new \nostriphant\Blossom\HTTP\ServerRequest($headers, $routeInfo[2], fopen('php://input', 'rb')));
         
-        header('HTTP/2 ' . ($response['status'] ?? '200'), true);
+        $input = fopen('php://input', 'rb');
+        $response = $routeInfo[1](new \nostriphant\Blossom\HTTP\ServerRequest($headers, $routeInfo[2], $input));
+        
+        header('HTTP/1.1 ' . ($response['status'] ?? '200'), true);
         
         $headers = $response['headers'] ?? [];
         array_walk($headers, fn(string $value, string $header) => header($header.': ' .$value));

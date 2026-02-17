@@ -2,7 +2,7 @@
 
 namespace nostriphant\Blossom\HTTP;
 
-readonly class ServerRequest {
+readonly class ServerRequest implements \IteratorAggregate {
     
     public function __construct(
             public array $headers,
@@ -22,5 +22,10 @@ readonly class ServerRequest {
             },
             default => null
         })($this->body);
+    }
+    
+    #[\Override]
+    public function getIterator(): \Traversable {
+        return $this();
     }
 }

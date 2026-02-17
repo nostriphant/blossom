@@ -8,16 +8,16 @@ readonly class Blossom implements \IteratorAggregate {
     
     private \Closure $upload_authorized;
     
-    public function __construct(private Blob\Factory $factory, callable $upload_authorized) {
+    public function __construct(private \nostriphant\NIP01\Key $server_key, private Blob\Factory $factory, callable $upload_authorized) {
         $this->upload_authorized = \Closure::fromCallable($upload_authorized);
     }
     
-    static function fromPath(string $path) : self {
-        return new self(new Blob\Factory($path), fn(string $pubkey_hex) => true);
+    static function fromPath(\nostriphant\NIP01\Key $server_key, string $path) : self {
+        return new self($server_key, new Blob\Factory($path), fn(string $pubkey_hex) => true);
     }
     
     public function __invoke(callable $upload_authorized): self {
-        return new self($this->factory, $upload_authorized);
+        return new self($this->server_key, $this->factory, $upload_authorized);
     }
 
     #[\Override]
@@ -43,6 +43,7 @@ readonly class Blossom implements \IteratorAggregate {
         };
         
         yield $wrap('/upload', new Endpoint\Upload($this->factory, $this->upload_authorized));
+        yield $wrap('/mirror', new Endpoint\Mirror($this->factory, $this->server_key, $this->upload_authorized));
         yield $wrap('/{hash:\w+}[.{ext:\w+}]', new Endpoint\Blob($this->factory));
     }
 }

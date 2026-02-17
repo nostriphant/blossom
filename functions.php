@@ -16,11 +16,12 @@ function request(string $method, string $uri, $upload_resource = null, ?array $a
             curl_setopt($curl, CURLOPT_NOBODY, true);
             break;
         case 'PUT':
-            curl_setopt($curl, CURLOPT_UPLOAD, 1);
             if (is_string($upload_resource)) {
+                curl_setopt($curl, CURLOPT_POST, 1);
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $upload_resource);
                 $headers[] = 'Content-Type:application/json';
             } else {
+                curl_setopt($curl, CURLOPT_UPLOAD, 1);
                 curl_setopt($curl, CURLOPT_READDATA, $upload_resource);
                 curl_setopt($curl, CURLOPT_READFUNCTION, fn($ch, $fh, int $length) => fread($fh, $length));
             }

@@ -50,6 +50,13 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         $mirror_content = '{"url": "'.$blob_descriptor->url.'"}';
         list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', 'http://127.0.0.1:8088/mirror', upload_resource: $mirror_content, authorization:['t' => 'upload', 'x' => $hash]);
         expect($status)->toBe('201');
+        
+        $blob_descriptor = json_decode($body);
+        expect($blob_descriptor->url)->toBe(FeatureCase::RELAY_URL . '/' . $expected_hash);
+        expect($blob_descriptor->sha256)->toBe($expected_hash);
+        expect($blob_descriptor->size)->toBe(14);
+        expect($blob_descriptor->type)->toBe('text/plain');
+        expect($blob_descriptor->uploaded)->toBeInt();
 
 
         expect($headers['content-location'])->toBe('/' . $expected_hash);
@@ -60,11 +67,17 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         expect($hash_file . '.owners')->toBeDirectory();
         expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->toBeFile();
 
-        unlink($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f');
-        rmdir($hash_file . '.owners');
-        unlink($hash_file);
+        list($protocol, $status, $headers, $body) = FeatureCase::request('DELETE', 'http://127.0.0.1:8088/' . $blob_descriptor->sha256, authorization:['t' => 'delete', 'x' => $hash]);
+        expect($status)->toBe('204');
+        expect($headers['access-control-allow-origin'])->toBe('*');
+
+        clearstatcache();
+        expect($hash_file)->not()->toBeFile();
+        expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
+        expect(glob($hash_file . '.owners/*'))->toHaveCount(0);
+        expect($hash_file . '.owners')->not()->toBeDirectory();
     } catch (\Exception $e) {
-        $blossom();
+        $blossom(false);
         throw $e;
     }
     $blossom();
