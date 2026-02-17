@@ -10,8 +10,8 @@ abstract class FeatureCase extends BaseTestCase
     const RELAY_URL = 'http://' . self::SOCKET;
     const LOG_DIRECTORY = ROOT_DIR . "/logs";
     
-    static function request(string $method, string $path, $upload_resource = null, ?array $authorization = null) : array {
-        return \nostriphant\Blossom\request($method, str_starts_with($path, 'http') ? $path : self::RELAY_URL . $path, $upload_resource, $authorization);
+    static function request(string $method, string $path, $upload_resource = null, ?array $authorization = null, ?array $headers = []) : array {
+        return \nostriphant\Blossom\request($method, str_starts_with($path, 'http') ? $path : self::RELAY_URL . $path, $upload_resource, $authorization, $headers);
     }
     
     static function writeFile(string $content) : string {

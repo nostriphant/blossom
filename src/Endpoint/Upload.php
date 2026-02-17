@@ -12,6 +12,7 @@ readonly class Upload implements \nostriphant\Blossom\Endpoint {
     
     #[\Override]
     public function __invoke(callable $define): void {
+        $define(\nostriphant\Blossom\HTTP\Method::HEAD, ($this->factory)(Upload\Head::class));
         $define(\nostriphant\Blossom\HTTP\Method::PUT, ($this->factory)(Upload\Put::class));
     }
 }

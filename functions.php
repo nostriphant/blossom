@@ -4,13 +4,12 @@ namespace nostriphant\Blossom;
 
 use nostriphant\NIP01\Key;
 
-function request(string $method, string $uri, $upload_resource = null, ?array $authorization = null) : array {
+function request(string $method, string $uri, $upload_resource = null, ?array $authorization = null, ?array $headers = []) : array {
     $curl = curl_init($uri);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_HEADER, true);
     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
     
-    $headers = [];
     switch ($method) {
         case 'HEAD':
             curl_setopt($curl, CURLOPT_NOBODY, true);
