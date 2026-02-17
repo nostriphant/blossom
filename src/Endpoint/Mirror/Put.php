@@ -31,19 +31,6 @@ readonly class Put implements \nostriphant\Blossom\Endpoint\Action {
             return ['status' => 500];
         }
 
-        return [
-            'status' => 201,
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Content-Location' => '/' . $blob->sha256
-            ],
-            'body' => json_encode([
-                "url" => $blob->url,
-                "sha256" => $blob->sha256,
-                "size" => $blob->size,
-                "type" => $blob->type,
-                "uploaded" => $blob->uploaded
-            ])
-        ];
+        return $blob();
     }
 }

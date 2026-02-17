@@ -4,7 +4,7 @@ namespace nostriphant\Blossom\Blob;
 
 
 class Remote {
-    public function __construct(private string $path) {
+    public function __construct(private string $path, private ?int $max_file_size) {
         
     }
     

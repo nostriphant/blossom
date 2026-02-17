@@ -13,11 +13,17 @@ readonly class Blossom implements \IteratorAggregate {
     }
     
     static function fromPath(\nostriphant\NIP01\Key $server_key, string $path) : self {
-        return new self($server_key, new Blob\Factory($path), fn(string $pubkey_hex) => true);
+        return new self($server_key, new Blob\Factory($path, null), fn(string $pubkey_hex) => true);
     }
     
     public function __invoke(UploadConstraints $constraints): self {
-        return new self($this->server_key, $this->factory, function(string $pubkey_hex, array $additional_headers, callable $unauthorized) use ($constraints) : bool|array {
+        
+        $factory = $this->factory;
+        if (isset($constraints->max_upload_size)) {
+            $factory = Blob\Factory::recreate($factory, max_file_size: $constraints->max_upload_size);
+        }
+        
+        return new self($this->server_key, $factory, function(string $pubkey_hex, array $additional_headers, callable $unauthorized) use ($constraints) : bool|array {
             if (isset($constraints->allowed_pubkeys)) {
                 if (in_array($pubkey_hex, $constraints->allowed_pubkeys) === false) {
                     return $unauthorized(401, '');

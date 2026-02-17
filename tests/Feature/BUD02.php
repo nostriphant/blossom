@@ -66,6 +66,29 @@ it('The PUT /upload endpoint MUST accept binary data in the body of the request'
 ]);
 
 
+it('The PUT /upload endpoint MUST honor upload size limit', function () {
+    $contents = str_repeat('aaa', 100);
+    
+    $resource = tmpfile();
+    fwrite($resource, $contents);
+    fseek($resource, 0);
+    
+    $hash = hash('sha256', $contents);
+    $hash_file = FILES_DIRECTORY . DIRECTORY_SEPARATOR . $hash;
+    
+    expect($hash_file)->not()->toBeFile();
+    expect($hash_file . '.owners')->not()->toBeDirectory();
+    expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
+    
+    list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', '/upload', upload_resource: $resource, authorization:['t' => 'upload', 'x' => $hash]);
+    expect($status)->toBe('413');
+
+    expect($hash_file)->not()->toBeFile();
+    expect($hash_file . '.owners')->not()->toBeDirectory();
+    expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
+});
+
+
 it('Servers MUST accept DELETE requests to the /<sha256> endpoint', function (string $contents, string $hash) {
 
     $resource = tmpfile();
