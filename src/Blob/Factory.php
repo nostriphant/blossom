@@ -3,7 +3,7 @@
 namespace nostriphant\Blossom\Blob;
 
 class Factory {
-    public function __construct(private string $path, private ?int $max_file_size) {
+    public function __construct(private string $path, private ?int $max_file_size, private array $unsupported_media_types) {
         
     }
     
@@ -13,9 +13,9 @@ class Factory {
     
     public function __invoke(?string $hash = null): mixed {
         if (isset($hash) === false) {
-            return new Uncreated($this->path, $this->max_file_size);
+            return new Uncreated($this->path, $this->max_file_size, $this->unsupported_media_types);
         } elseif ($hash === "remote") {
-            return new Remote($this->path, $this->max_file_size);
+            return new Remote($this->path, $this->max_file_size, $this->unsupported_media_types);
         }
         return new \nostriphant\Blossom\Blob($this->path . DIRECTORY_SEPARATOR . $hash);
     }

@@ -89,6 +89,60 @@ it('The PUT /upload endpoint MUST honor upload size limit', function () {
 });
 
 
+it('The PUT /upload endpoint MUST check content-type when existing', function () {
+    $contents = str_repeat('ccc', 100);
+    
+    $resource = tmpfile();
+    fwrite($resource, $contents);
+    fseek($resource, 0);
+    
+    $hash = hash('sha256', $contents);
+    $hash_file = FILES_DIRECTORY . DIRECTORY_SEPARATOR . $hash;
+    
+    expect($hash_file)->not()->toBeFile();
+    expect($hash_file . '.owners')->not()->toBeDirectory();
+    expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
+    
+    list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', '/upload', upload_resource: $resource, authorization:['t' => 'upload', 'x' => $hash], headers:[
+        'Content-Type: text/plain',
+        'Content-Length: ' . strlen($contents)
+    ]);
+    expect($status)->toBe('413');
+    expect($headers['x-reason'])->toBe('File too large. Max allowed size is 100 bytes.');
+
+    expect($hash_file)->not()->toBeFile();
+    expect($hash_file . '.owners')->not()->toBeDirectory();
+    expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
+});
+
+
+it('The PUT /upload endpoint MUST check content-length when existing', function () {
+    $contents = 'All right now!';
+    
+    $resource = tmpfile();
+    fwrite($resource, $contents);
+    fseek($resource, 0);
+    
+    $hash = hash('sha256', $contents);
+    $hash_file = FILES_DIRECTORY . DIRECTORY_SEPARATOR . $hash;
+    
+    expect($hash_file)->not()->toBeFile();
+    expect($hash_file . '.owners')->not()->toBeDirectory();
+    expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
+    
+    
+    list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', '/upload', upload_resource: $resource, authorization:['t' => 'upload', 'x' => $hash], headers:[
+        'Content-Type: audio/wav',
+        'Content-Length: ' . strlen($contents)
+    ]);
+    expect($status)->toBe('415');
+    expect($headers['x-reason'])->toBe('Unsupported file type.');
+
+    expect($hash_file)->not()->toBeFile();
+    expect($hash_file . '.owners')->not()->toBeDirectory();
+    expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
+});
+
 it('Servers MUST accept DELETE requests to the /<sha256> endpoint', function (string $contents, string $hash) {
 
     $resource = tmpfile();

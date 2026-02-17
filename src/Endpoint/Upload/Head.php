@@ -17,7 +17,7 @@ readonly class Head implements \nostriphant\Blossom\Endpoint\Action {
             return $unauthorized(400, 'Mssing X-Content-Type, X-Content-Length or X-SHA-256 headers');
         }
         
-        $result = call_user_func($this->upload_authorized, $authorization_event->pubkey, $additional_headers, $unauthorized);
+        $result = call_user_func($this->upload_authorized, $authorization_event->pubkey, $additional_headers['X_CONTENT_LENGTH'], $additional_headers['X_CONTENT_TYPE'], $unauthorized);
         return $result === true ? $action() : $result;
     }
 

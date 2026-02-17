@@ -4,7 +4,7 @@ namespace nostriphant\Blossom\Blob;
 
 
 class Uncreated {
-    public function __construct(private string $path, private ?int $max_file_size) {
+    public function __construct(private string $path, private ?int $max_file_size, private array $unsupported_media_types) {
         
     }
     
