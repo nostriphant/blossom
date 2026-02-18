@@ -31,6 +31,10 @@ class Remote {
         }
         
         foreach(http_get_last_response_headers() as $response_header) {
+            if (str_starts_with($response_header, 'HTTP/')) {
+                continue;
+            }
+            
             list($header, $value) = explode(':', $response_header, 2);
             switch (strtolower($header)) {
                 case 'content-length':
