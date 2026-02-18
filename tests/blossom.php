@@ -28,6 +28,8 @@ if (false !== $pos = strpos($uri, '?')) {
     $uri = substr($uri, 0, $pos);
 }
 
+error_log('Incoming ' . $httpMethod . ' ' . $uri);
+
 $routeInfo = $dispatcher->dispatch($httpMethod, rawurldecode($uri));
 switch ($routeInfo[0]) {
     case FastRoute\Dispatcher::NOT_FOUND:

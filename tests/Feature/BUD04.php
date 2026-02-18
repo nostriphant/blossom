@@ -81,17 +81,11 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         $blossom(false);
         throw $e;
     }
-    $blossom();
-})->with([
-    [$contents = 'Hello Wddorld!!!', null]
-]);
-
-
-it('The /mirror endpoint fails on mirroring files larger than max file size', function (string $contents, ?string $hash, ?int $content_length, ?string $content_type, string $expected_status, string $expected_reason) {
+    
+    
+    $contents = str_repeat('bbb', 100);
     $hash ??= hash('sha256', $contents);
     $content_length ??= strlen($contents);
-    
-    $blossom = FeatureCase::start_blossom('127.0.0.1:8088', FeatureCase::LOG_DIRECTORY . "/blossom-8088.log", FeatureCase::LOG_DIRECTORY . "/blossom-errors-8088.log");
     
     try {
         $hash_original_file = FILES_DIRECTORY . DIRECTORY_SEPARATOR . $hash;
@@ -101,8 +95,8 @@ it('The /mirror endpoint fails on mirroring files larger than max file size', fu
 
         $mirror_content = '{"url": "'.FeatureCase::RELAY_URL . '/' . $hash.'"}';
         list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', 'http://127.0.0.1:8088/mirror', upload_resource: $mirror_content, authorization:['t' => 'upload', 'x' => $hash]);
-        expect($status)->toBe($expected_status, $body);
-        expect($headers['x-reason'])->toBe($expected_reason);
+        expect($status)->toBe('413', $body);
+        expect($headers['x-reason'])->toBe('Filesize of remote file seems larger than max allowed file size.');
 
         clearstatcache();
         $hash_file = $blossom->files_directory . '/' . $hash;
@@ -114,11 +108,13 @@ it('The /mirror endpoint fails on mirroring files larger than max file size', fu
         $blossom(false);
         throw $e;
     }
+    
     $blossom();
 })->with([
-    [str_repeat('bbb', 100), null, null, null, '413', 'Filesize of remote file seems larger than max allowed file size.'], 
-    
+    [$contents = 'Hello Wddorld!!!', null]
 ]);
+
+
 //
 //
 //it('The PUT /upload endpoint MUST check content-type when existing', function () {

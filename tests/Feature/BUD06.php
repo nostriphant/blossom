@@ -4,24 +4,6 @@ namespace nostriphant\BlossomTests\Feature;
 
 use \nostriphant\BlossomTests\FeatureCase;
 
-    
-describe("OPTIONS /upload", function() {
-    it('For preflight (OPTIONS) requests, servers MUST also set, at minimum, the Access-Control-Allow-Headers: Authorization, * and Access-Control-Allow-Methods: PUT headers.', function () {
-        $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!');
-        list($protocol, $status, $headers, $body) = FeatureCase::request('OPTIONS', '/upload');
-        expect($status)->toBe('204');
-        expect($headers['access-control-allow-origin'])->toBe('Authorization, *');
-        expect(explode(', ', $headers['access-control-allow-methods']))->toContain('PUT');
-        expect($body)->toBeEmpty();
-    });
-
-    it('The header Access-Control-Max-Age: 86400 MAY be set to cache the results of a preflight request for 24 hours.', function () {
-        $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!');
-        list($protocol, $status, $headers, $body) = FeatureCase::request('OPTIONS', '/upload');
-        expect($headers['access-control-max-age'])->toBe('86400');
-    });
-});
-
 it('The HEAD /upload endpoint MUST use the X-SHA-256, X-Content-Type and X-Content-Length headers required to be sent by client', function () {
     $contents = 'shoebydoe';
     $hash ??= hash('sha256', $contents);

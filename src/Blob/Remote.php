@@ -30,21 +30,16 @@ class Remote {
             return new \nostriphant\Blossom\Blob\Failed(500, 'Unable to open remote location.');
         }
         
-        foreach(http_get_last_response_headers() as $response_header) {
-            if (str_starts_with($response_header, 'HTTP/')) {
-                continue;
-            }
-            
-            list($header, $value) = explode(':', $response_header, 2);
-            switch (strtolower($header)) {
+        
+        foreach(new \nostriphant\Blossom\HTTP\HeaderStruct(http_get_last_response_headers()) as $header => $value) {
+            switch ($header) {
                 case 'content-length':
-                    if ($value > $this->max_file_size) {
+                    if ($value[0] > $this->max_file_size) {
                         return new \nostriphant\Blossom\Blob\Failed(413, 'Filesize of remote file seems larger than max allowed file size.');
                     }
                     break;
                 case 'content-type':
-                    list($value,) = explode(';', trim($value));
-                    if (call_user_func($this->unsupported_media_types, $value)) {
+                    if (call_user_func($this->unsupported_media_types, $value[0])) {
                         return new \nostriphant\Blossom\Blob\Failed(415, 'Unsupported file type "' . $value . '".');
                     }
                     break;

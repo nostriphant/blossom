@@ -48,8 +48,6 @@ abstract class FeatureCase extends BaseTestCase
         ]);
 
         fclose($pipes[0]);
-
-        while (str_contains(file_get_contents($errors), 'Development Server (http://' . $socket . ') started') === false){ }
         
         return new class($files_path, $process) {
             

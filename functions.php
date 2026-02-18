@@ -56,18 +56,10 @@ function request(string $method, string $uri, $upload_resource = null, ?array $a
     $info = curl_getinfo($curl);
     curl_close($curl);
 
-    $response_headers = explode("\r\n", substr($raw_response, 0, $info['header_size']));
-    list($protocol, $status) = explode(' ', array_shift($response_headers));
+    
+    $headers = new HTTP\HeaderStruct(explode("\r\n", substr($raw_response, 0, $info['header_size'])));
     $response_body = substr($raw_response, $info['header_size']);
-
-    return [$protocol, $status, array_reduce($response_headers, function(array $carry, string $header) {
-        if (empty($header)) {
-            return $carry;
-        }
-        list($name, $value) = explode(":", $header, 2);
-        $carry[strtolower($name)] = trim($value, " ");
-        return $carry;
-    } , []), $response_body];
+    return [$headers['protocol'], $headers['status'], $headers, $response_body];
 }
 
 function writeFile(string $directory, string $content) : string {
