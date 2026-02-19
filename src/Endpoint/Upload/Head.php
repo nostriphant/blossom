@@ -5,10 +5,8 @@ namespace nostriphant\Blossom\Endpoint\Upload;
 readonly class Head implements \nostriphant\Blossom\Endpoint\Action {
 
     private \Closure $upload_authorized;
-    private \Closure $stream;
 
-    public function __construct(callable $upload_authorized, private \nostriphant\Blossom\Blob\Uncreated $blob, callable $stream) {
-        $this->stream = \Closure::fromCallable($stream);
+    public function __construct(callable $upload_authorized, private \nostriphant\Blossom\Blob\Uncreated $blob, private mixed $stream) {
         $this->upload_authorized = \Closure::fromCallable($upload_authorized);
     }
 

@@ -51,7 +51,9 @@ function request(string $method, string $uri, $upload_resource = null, ?array $a
     curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
     $raw_response = curl_exec($curl);
     if ($raw_response === false) {
-        throw new \Exception('Request to `'.$uri.'` failed: ' . curl_error($curl));
+        $error = curl_error($curl);
+        curl_close($curl);
+        return [null, null, [], $error];
     }
     $info = curl_getinfo($curl);
     curl_close($curl);

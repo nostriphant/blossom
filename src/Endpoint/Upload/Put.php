@@ -5,11 +5,9 @@ namespace nostriphant\Blossom\Endpoint\Upload;
 readonly class Put implements \nostriphant\Blossom\Endpoint\Action {
 
     private \Closure $upload_authorized;
-    private \Closure $stream;
     
-    public function __construct(callable $upload_authorized, private \nostriphant\Blossom\Blob\Uncreated $blob, callable $stream) {
+    public function __construct(callable $upload_authorized, private \nostriphant\Blossom\Blob\Uncreated $blob, private mixed $stream) {
         $this->upload_authorized = \Closure::fromCallable($upload_authorized);
-        $this->stream = \Closure::fromCallable($stream);
     }
     
     public function authorize(\nostriphant\NIP01\Event $authorization_event, array $additional_headers, callable $action, callable $unauthorized) : array {

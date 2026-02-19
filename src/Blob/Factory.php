@@ -15,12 +15,13 @@ class Factory {
         return new self(...array_merge(get_object_vars($factory), $new_args));
     }
     
-    public function __invoke(?string $hash = null): mixed {
-        if (isset($hash) === false) {
-            return new Uncreated($this->path, $this->max_file_size, $this->unsupported_media_types);
+    public function __invoke(string $hash): mixed {
+        if (str_starts_with($hash, 'upload:')) {
+            list($action, $hash) = explode(':', $hash, 2);
+            return new Uncreated(new \nostriphant\Blossom\VFS\Directory($this->path, $this->max_file_size), $hash, $this->unsupported_media_types);
         } elseif ($hash === "remote") {
-            return new Remote($this->path, $this->max_file_size, $this->unsupported_media_types);
+            return new Remote(new \nostriphant\Blossom\VFS\Directory($this->path, $this->max_file_size), $this->unsupported_media_types);
         }
-        return new \nostriphant\Blossom\Blob($this->path . DIRECTORY_SEPARATOR . $hash);
+        return new \nostriphant\Blossom\Blob(new \nostriphant\Blossom\VFS\File($this->path . DIRECTORY_SEPARATOR . $hash));
     }
 }

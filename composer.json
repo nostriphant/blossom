@@ -38,11 +38,8 @@
         }
     },
     "scripts": {
-        "clearCache": [
-            "rm -rf ./data/files/*"
-        ],
         "test": [
-            "@clearCache @no_additional_args",
+            "rm -rf ./data/files/*",
             "./vendor/bin/pest"
         ]
     }

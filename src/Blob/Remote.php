@@ -7,7 +7,7 @@ class Remote {
     
     private \Closure $unsupported_media_types;
     
-    public function __construct(private string $path, private ?int $max_file_size, callable $unsupported_media_types) {
+    public function __construct(private \nostriphant\Blossom\VFS\Directory $directory, callable $unsupported_media_types) {
         $this->unsupported_media_types = \Closure::fromCallable($unsupported_media_types);
     }
     
@@ -34,7 +34,7 @@ class Remote {
         foreach(new \nostriphant\Blossom\HTTP\HeaderStruct(http_get_last_response_headers()) as $header => $value) {
             switch ($header) {
                 case 'content-length':
-                    if ($value[0] > $this->max_file_size) {
+                    if ($value[0] > $this->directory->max_file_size) {
                         return new \nostriphant\Blossom\Blob\Failed(413, 'Filesize of remote file seems larger than max allowed file size.');
                     }
                     break;
@@ -47,30 +47,13 @@ class Remote {
         }
         
         $temp = tempnam($this->path, "buffer.");
-        
-        $written = 0;
-        $handle = fopen($temp, 'wb');
-        while (feof($handle_remote) === false) {
-            $chunk = fread($handle_remote, 1024);
-            $written += fwrite($handle, $chunk);
-            if ($written > $this->max_file_size) {
-                fclose($handle);
-                unlink($temp);
-                return new \nostriphant\Blossom\Blob\Failed(413, 'Filesize of remote file larger than max allowed file size.');
-            }
+        try {
+            $file = ($this->directory)($pubkey_hex, $handle_remote, $hash);
+            fclose($handle_remote);
+            return new \nostriphant\Blossom\Blob\Created($file);
+        } catch (\nostriphant\Blossom\Exception $e) {
+            return Failed::fromException($e);
         }
-        fclose($handle_remote);
-        fclose($handle);
-        
-        $target_location = $this->path . DIRECTORY_SEPARATOR . hash_file('sha256', $temp);
-        if (file_exists($target_location) === false) {
-            rename($temp, $target_location);
-            mkdir($target_location . '.owners');
-        }
-        
-        touch($target_location . '.owners' . DIRECTORY_SEPARATOR . $pubkey_hex);
-        
-        return new \nostriphant\Blossom\Blob($target_location);
     }
     
 }

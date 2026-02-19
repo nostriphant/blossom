@@ -6,23 +6,16 @@ namespace nostriphant\Blossom;
 readonly class Blob {
     
     public bool $exists;
-    public string $sha256;
-    public string $type;
-    public int $size;
     public string $url;
     public int $uploaded;
     public array $owners;
     
-    public function __construct(private string $path) {
-        $this->exists = file_exists($path);
-        $this->sha256 = basename($path);
-        if ($this->exists) {
-            $this->type = 'text/plain';
-            $this->size = filesize($this->path);
-            $this->url = "http://127.0.0.1:8087/" . $this->sha256;
-            $this->uploaded = filectime($path);
-            
-            $this->owners = array_map('basename', glob($this->path . '.owners/*'));
+    public function __construct(private VFS\File $file) {
+        $this->exists = $file->exists;
+        if ($file->exists) {
+            $this->url = "http://127.0.0.1:8087/" . $this->file->sha256;
+            $this->uploaded = $file->created;
+            $this->owners = array_map('basename', glob($file->path . '.owners/*'));
         }
     }
     
@@ -40,26 +33,16 @@ readonly class Blob {
     }
     
     public function __get(string $name): mixed {
-        return match($name) {
-            'contents' => file_get_contents($this->path),
-            default => null
-        };
+        return $this->file->$name;
     }
     
     public function __invoke(): array {
         return [
-            'status' => 201,
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Content-Location' => '/' . $this->sha256
+            'headers' => [ 
+                'Content-Type' => $this->file->type,
+                'Content-Length' => $this->file->size
             ],
-            'body' => json_encode([
-                "url" => $this->url,
-                "sha256" => $this->sha256,
-                "size" => $this->size,
-                "type" => $this->type,
-                "uploaded" => $this->uploaded
-            ])
+            'body' => VFS\File::read($this->file)
         ];
     }
 }

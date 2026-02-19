@@ -8,6 +8,10 @@ readonly class Failed extends \nostriphant\Blossom\Blob {
         $this->exists = false;
     }
 
+    static function fromException(\nostriphant\Blossom\Exception $exception) {
+        return new self($exception->getCode(), $exception->getMessage());
+    }
+    
     public function __invoke(): array {
         return ['status' => $this->code, 'headers' => ['x-reason' => $this->reason]];
     }

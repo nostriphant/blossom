@@ -33,16 +33,20 @@ error_log('Incoming ' . $httpMethod . ' ' . $uri);
 $routeInfo = $dispatcher->dispatch($httpMethod, rawurldecode($uri));
 switch ($routeInfo[0]) {
     case FastRoute\Dispatcher::NOT_FOUND:
+        error_log('Not found');
         header('HTTP/1.1 404', true);
         break;
     case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
         $allowedMethods = $routeInfo[1];
         // ... 405 Method Not Allowed
+        error_log('Method not allowed');
         header('HTTP/1.1 405', true);
         break;
     case FastRoute\Dispatcher::FOUND:
         $headers = array_filter($_SERVER, fn(string $key) => str_starts_with($key, 'HTTP_'), ARRAY_FILTER_USE_KEY);
+       
         
+        error_log('Found');
         $input = fopen('php://input', 'rb');
         $response = $routeInfo[1](new \nostriphant\Blossom\HTTP\ServerRequest($headers, $routeInfo[2], $input));
         
