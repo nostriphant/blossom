@@ -20,6 +20,13 @@ readonly class Blob {
     }
     
     static function delete(self $blob, string $pubkey_hex) : bool {
+        if ($blob->file->exists === false) {
+            throw new Exception(200, 'File does not exist');
+        } elseif (in_array($pubkey_hex, $blob->owners) === false) {
+            throw new Exception(403, 'Pubkey is not an owner');
+        }
+        
+        
         $owners_directory = $blob->path . '.owners';
         $owner_file = $owners_directory . DIRECTORY_SEPARATOR . $pubkey_hex;
         is_file($owner_file) && unlink($owner_file);

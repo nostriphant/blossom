@@ -17,14 +17,11 @@ readonly class Delete implements \nostriphant\Blossom\Endpoint\Action {
     
     #[\Override]
     public function __invoke(string $pubkey_hex, array $args) : array {
-        if ($this->blob->exists === false) {
-            return ['status' => 200];
-        } elseif (in_array($pubkey_hex, $this->blob->owners) === false) {
-            return ['status' => 403];
+        try {
+            \nostriphant\Blossom\Blob::delete($this->blob, $pubkey_hex);
+            return ['status' =>  204];
+        } catch (\nostriphant\Blossom\Exception $e) {
+            return ['status' => $e->getCode(), 'headers' => ['x-reason' => $e->getMessage()]];
         }
-        
-        \nostriphant\Blossom\Blob::delete($this->blob, $pubkey_hex);
-        
-        return ['status' =>  204];
     }
 }
