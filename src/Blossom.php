@@ -15,22 +15,6 @@ readonly class Blossom implements \IteratorAggregate {
         }
         $this->factory = $factory;
         
-        $unsupported_type_checker = function(string $content_type) use ($constraints) {
-            if (isset($constraints->unsupported_content_types) === false) {
-                return false;
-            } elseif (in_array($content_type, $constraints->unsupported_content_types)) {
-                return true;
-            }
-
-            foreach (array_filter($constraints->unsupported_content_types, fn(string $unsupported_content_type) => str_ends_with($unsupported_content_type, '/*')) as $unsupported_content_type) {
-                list($category, $type) = explode('/', $unsupported_content_type, 2);
-                if (str_starts_with($content_type, $category . '/')) {
-                    return true;
-                }
-            }
-            return false;
-        };
-        
         $this->upload_authorized = function(string $pubkey_hex, int $content_length, ?string $content_type, callable $unauthorized) use ($constraints, $unsupported_type_checker) : bool|array {
             if (isset($constraints->allowed_pubkeys)) {
                 if (in_array($pubkey_hex, $constraints->allowed_pubkeys) === false) {
@@ -45,8 +29,16 @@ readonly class Blossom implements \IteratorAggregate {
             }
             
             if (isset($constraints->unsupported_content_types) && isset($content_type)) {
-                if ($unsupported_type_checker($content_type)) {
+                if (isset($constraints->unsupported_content_types) === false) {
+                } elseif (in_array($content_type, $constraints->unsupported_content_types)) {
                     return $unauthorized(415, 'Unsupported file type "' . $content_type . '".');
+                }
+
+                foreach (array_filter($constraints->unsupported_content_types, fn(string $unsupported_content_type) => str_ends_with($unsupported_content_type, '/*')) as $unsupported_content_type) {
+                    list($category, $type) = explode('/', $unsupported_content_type, 2);
+                    if (str_starts_with($content_type, $category . '/')) {
+                        return $unauthorized(415, 'Unsupported file type "' . $content_type . '".');
+                    }
                 }
             }
             return true;
