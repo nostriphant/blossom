@@ -98,7 +98,7 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         $mirror_content = '{"url": "'.FeatureCase::RELAY_URL . '/' . $hash.'"}';
         list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', 'http://127.0.0.1:8088/mirror', upload_resource: $mirror_content, authorization:['t' => 'upload', 'x' => $hash]);
         expect($status)->toBe('413', $body);
-        expect($headers['x-reason'])->toBe('Filesize of remote file seems larger than max allowed file size.');
+        expect($headers['x-reason'])->toBe('Filesize larger than max allowed file size.');
 
         clearstatcache();
         $hash_file = $blossom->files_directory . '/' . $hash;

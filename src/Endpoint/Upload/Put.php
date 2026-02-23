@@ -16,7 +16,7 @@ readonly class Put implements \nostriphant\Blossom\Endpoint\Action {
     }
     
     #[\Override]
-    public function __invoke(string $pubkey_hex): array {
+    public function __invoke(string $pubkey_hex, array $args): array {
         $blob = ($this->blob)($pubkey_hex, $this->stream);
         return $blob();
     }

@@ -16,17 +16,17 @@ class Authorization {
         if (isset($request->authorization) === false) {
             return $unauthorized(401, 'No authorization found');
         } elseif (\nostriphant\NIP01\Event::verify($request->authorization) === false) {
-            return $unauthorized(401, '');
+            return $unauthorized(401, 'Invalid authorization event');
         } elseif ($request->authorization->kind !== 24242) {
-            return $unauthorized(401, '');
+            return $unauthorized(401, 'Incorrent authorization event kind');
         } elseif (empty($request->authorization->content)) {
-            return $unauthorized(401, '');
+            return $unauthorized(401, 'Authorization event content is missing');
         } elseif (\nostriphant\NIP01\Event::hasTag($request->authorization, 't') === false) {
-            return $unauthorized(401, '');
+            return $unauthorized(401, 'Authorization event is missing t-tag');
         } elseif (\nostriphant\NIP01\Event::hasTag($request->authorization, 'expiration') === false) {
-            return $unauthorized(401, '');
+            return $unauthorized(401, 'Authorization event is missing expiration-tag');
         } elseif (\nostriphant\NIP01\Event::extractTagValues($request->authorization, 'expiration')[0][0] < time()) {
-            return $unauthorized(401, '');
+            return $unauthorized(401, 'Authorization event has expired');
         }
         
         $additional_headers = [];
@@ -36,6 +36,6 @@ class Authorization {
         }
         
         $action = ($this->action_factory)($request);
-        return $action->authorize($request->authorization, $additional_headers, fn() => ($this->handler)($action($request->authorization->pubkey)), $unauthorized);
+        return $action->authorize($request->authorization, $additional_headers, fn(mixed ...$args) => ($this->handler)($action($request->authorization->pubkey, $args)), $unauthorized);
     }
 }

@@ -34,7 +34,7 @@ readonly class Blossom implements \IteratorAggregate {
         $this->upload_authorized = function(string $pubkey_hex, int $content_length, ?string $content_type, callable $unauthorized) use ($constraints, $unsupported_type_checker) : bool|array {
             if (isset($constraints->allowed_pubkeys)) {
                 if (in_array($pubkey_hex, $constraints->allowed_pubkeys) === false) {
-                    return $unauthorized(401, '');
+                    return $unauthorized(401, 'Pubkey "' . $pubkey_hex . '" is not allowed to upload files');
                 }
             }
         
