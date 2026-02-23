@@ -11,12 +11,12 @@ readonly class Put implements \nostriphant\Blossom\Endpoint\Action {
     }
     
     public function authorize(\nostriphant\NIP01\Event $authorization_event, array $additional_headers, callable $action, callable $unauthorized) : array {
-        return call_user_func($this->upload_authorized, 
-                $authorization_event->pubkey, 
+        return $action(fn(string $pubkey_hex) => ($this->upload_authorized)(
+                $pubkey_hex, 
                 $additional_headers['CONTENT_LENGTH'] ?? -1, 
                 $additional_headers['CONTENT_TYPE'] ?? "application/octet-stream", 
-                fn() => $action(fn(string $pubkey_hex): array => ($this->blob)($pubkey_hex, $this->stream, \nostriphant\NIP01\Event::extractTagValues($authorization_event, 'x')[0][0])),
+                fn(string $pubkey_hex) => ($this->blob)($pubkey_hex, $this->stream, \nostriphant\NIP01\Event::extractTagValues($authorization_event, 'x')[0][0]),
                 $unauthorized
-        );
+        ));
     }
 }

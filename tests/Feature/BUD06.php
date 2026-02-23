@@ -39,7 +39,7 @@ it('The HEAD /upload endpoint MUST use headers sent by client', function (string
         'X-Content-Length: ' . $content_length,
         'X-SHA-256: ' . $hash
     ]);
-    expect($status)->toBe($response_status);
+    expect($status)->toBe($response_status, $headers['x-reason'] ?? 'no reason');
     if (isset($x_reason)) {
         expect($headers['x-reason'])->toBe($x_reason);
     } else {

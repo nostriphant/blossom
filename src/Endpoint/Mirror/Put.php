@@ -17,7 +17,7 @@ readonly class Put implements \nostriphant\Blossom\Endpoint\Action {
         }
         $json = json_decode($body);
         if (is_null($json)) {
-            return ['status' => 400];
+            return $unauthorized(400, 'Unparsable authorization event.');
         }
         
         $url = $json->url;
@@ -36,15 +36,15 @@ readonly class Put implements \nostriphant\Blossom\Endpoint\Action {
         ]]));
         
         if ($handle_remote === false) {
-            return ['status'=> 500, 'reason' => 'Unable to open remote location.'];
+            return $unauthorized(500, 'Unable to open remote location.');
         }
         
         $headers = new \nostriphant\Blossom\HTTP\HeaderStruct(http_get_last_response_headers());
-        return call_user_func($this->upload_authorized, 
-                $authorization_event->pubkey, 
+        return $action(fn(string $pubkey_hex) => ($this->upload_authorized)(
+                $pubkey_hex, 
                 $headers['content-length'][0] ?? -1, $headers['content-type'][0] ?? '', 
-                fn() => $action(fn(string $pubkey_hex) => ($this->blob)($pubkey_hex, $handle_remote, $hash)),
+                fn(string $pubkey_hex) => ($this->blob)($pubkey_hex, $handle_remote, $hash),
                 $unauthorized
-        );
+        ));
     }
 }

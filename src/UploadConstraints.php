@@ -38,6 +38,6 @@ class UploadConstraints {
                 }
             }
         }
-        return $authorized();
+        return $authorized($pubkey_hex);
     }
 }
