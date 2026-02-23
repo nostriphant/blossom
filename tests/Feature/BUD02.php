@@ -90,7 +90,7 @@ it('The PUT /upload endpoint MUST honor upload size limit', function () {
 });
 
 
-it('The PUT /upload endpoint MUST check content-type when existing', function () {
+it('The PUT /upload endpoint MUST check content-length when existing', function () {
     $contents = str_repeat('ccc', 100);
     
     $resource = tmpfile();
@@ -117,7 +117,7 @@ it('The PUT /upload endpoint MUST check content-type when existing', function ()
 });
 
 
-it('The PUT /upload endpoint MUST check content-length when existing', function () {
+it('The PUT /upload endpoint MUST check content-type when existing', function () {
     $contents = 'All right now!';
     
     $resource = tmpfile();
