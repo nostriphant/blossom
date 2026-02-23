@@ -15,6 +15,10 @@ class Factory {
         if (isset($hash) === false) {
             return new Uncreated(new \nostriphant\Blossom\VFS\Directory($this->path, $this->max_file_size));
         }
-        return new \nostriphant\Blossom\Blob(new \nostriphant\Blossom\VFS\File($this->path . DIRECTORY_SEPARATOR . $hash));
+        $file = new \nostriphant\Blossom\VFS\File($this->path . DIRECTORY_SEPARATOR . $hash);
+        if ($file->exists === false) {
+            return new \nostriphant\Blossom\Blob\Missing($file);
+        }
+        return new \nostriphant\Blossom\Blob($file);
     }
 }
