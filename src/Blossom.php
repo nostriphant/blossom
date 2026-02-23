@@ -7,17 +7,9 @@ use \nostriphant\Functional\FunctionList;
 readonly class Blossom implements \IteratorAggregate {
     
     private \Closure $upload_authorized;
+    private Blob\Factory $factory;
     
-    public function __construct(private \nostriphant\NIP01\Key $server_key, private Blob\Factory $factory, callable $upload_authorized) {
-        $this->upload_authorized = \Closure::fromCallable($upload_authorized);
-    }
-    
-    static function fromPath(\nostriphant\NIP01\Key $server_key, string $path) : self {
-        return new self($server_key, new Blob\Factory($path, null, fn() => true), fn(string $pubkey_hex) => true);
-    }
-    
-    public function __invoke(UploadConstraints $constraints): self {
-        $factory = $this->factory;
+    public function __construct(private \nostriphant\NIP01\Key $server_key, Blob\Factory $factory, UploadConstraints $constraints) {
         if (isset($constraints->max_upload_size)) {
             $factory = Blob\Factory::recreate($factory, max_file_size: $constraints->max_upload_size);
         }
@@ -37,9 +29,9 @@ readonly class Blossom implements \IteratorAggregate {
             return false;
         };
 
-        $factory = Blob\Factory::recreate($factory, unsupported_media_types: $unsupported_type_checker);
+        $this->factory = Blob\Factory::recreate($factory, unsupported_media_types: $unsupported_type_checker);
         
-        return new self($this->server_key, $factory, function(string $pubkey_hex, int $content_length, ?string $content_type, callable $unauthorized) use ($constraints, $unsupported_type_checker) : bool|array {
+        $this->upload_authorized = function(string $pubkey_hex, int $content_length, ?string $content_type, callable $unauthorized) use ($constraints, $unsupported_type_checker) : bool|array {
             if (isset($constraints->allowed_pubkeys)) {
                 if (in_array($pubkey_hex, $constraints->allowed_pubkeys) === false) {
                     return $unauthorized(401, '');
@@ -58,7 +50,14 @@ readonly class Blossom implements \IteratorAggregate {
                 }
             }
             return true;
-        });
+        };
+    }
+    
+    static function fromPath(\nostriphant\NIP01\Key $server_key, string $path, UploadConstraints $constraints) : self {
+        return new self($server_key, new Blob\Factory($path, null, fn() => true), $constraints);
+    }
+    
+    public function __invoke(UploadConstraints $constraints): self {
     }
 
     #[\Override]

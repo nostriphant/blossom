@@ -8,7 +8,6 @@ class Factory {
     
     public function __construct(private string $path, private ?int $max_file_size, callable $unsupported_media_types) {
         $this->unsupported_media_types = \Closure::fromCallable($unsupported_media_types);
-        
     }
     
     static function recreate(self $factory, mixed ...$new_args) : self {
