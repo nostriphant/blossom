@@ -7,7 +7,7 @@ readonly class Upload implements \nostriphant\Blossom\Endpoint {
     private Factory $factory;
     
     public function __construct(\nostriphant\Blossom\Blob\Factory $blob_factory, callable $upload_authorized) {
-        $this->factory = new Factory(fn(\nostriphant\Blossom\HTTP\ServerRequest $request) => [$upload_authorized, $blob_factory('upload:' . \nostriphant\NIP01\Event::extractTagValues($request->authorization, 'x')[0][0]), $request->body]);
+        $this->factory = new Factory(fn(\nostriphant\Blossom\HTTP\ServerRequest $request) => [$upload_authorized, $blob_factory('upload'), $request->body]);
     }
     
     #[\Override]

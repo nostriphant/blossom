@@ -12,9 +12,8 @@ class Factory {
     }
     
     public function __invoke(string $hash): mixed {
-        if (str_starts_with($hash, 'upload:')) {
-            list($action, $hash) = explode(':', $hash, 2);
-            return new Uncreated(new \nostriphant\Blossom\VFS\Directory($this->path, $this->max_file_size), $hash);
+        if ($hash === 'upload') {
+            return new Uncreated(new \nostriphant\Blossom\VFS\Directory($this->path, $this->max_file_size));
         } elseif ($hash === "remote") {
             return new Remote(new \nostriphant\Blossom\VFS\Directory($this->path, $this->max_file_size));
         }
