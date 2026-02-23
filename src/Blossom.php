@@ -6,43 +6,13 @@ use \nostriphant\Functional\FunctionList;
 
 readonly class Blossom implements \IteratorAggregate {
     
-    private \Closure $upload_authorized;
     private Blob\Factory $factory;
     
-    public function __construct(private \nostriphant\NIP01\Key $server_key, Blob\Factory $factory, UploadConstraints $constraints) {
-        if (isset($constraints->max_upload_size)) {
-            $factory = Blob\Factory::recreate($factory, max_file_size: $constraints->max_upload_size);
+    public function __construct(private \nostriphant\NIP01\Key $server_key, Blob\Factory $factory, private UploadConstraints $upload_constraints) {
+        if (isset($upload_constraints->max_upload_size)) {
+            $factory = Blob\Factory::recreate($factory, max_file_size: $upload_constraints->max_upload_size);
         }
         $this->factory = $factory;
-        
-        $this->upload_authorized = function(string $pubkey_hex, int $content_length, string $content_type, callable $unauthorized) use ($constraints, $unsupported_type_checker) : bool|array {
-            if (isset($constraints->allowed_pubkeys)) {
-                if (in_array($pubkey_hex, $constraints->allowed_pubkeys) === false) {
-                    return $unauthorized(401, 'Pubkey "' . $pubkey_hex . '" is not allowed to upload files');
-                }
-            }
-        
-            if (isset($constraints->max_upload_size)) {
-                if ($content_length > $constraints->max_upload_size) {
-                    return $unauthorized(413, 'File too large. Max allowed size is '.$constraints->max_upload_size.' bytes.');
-                }
-            }
-            
-            if (isset($constraints->unsupported_content_types)) {
-                if (isset($constraints->unsupported_content_types) === false) {
-                } elseif (in_array($content_type, $constraints->unsupported_content_types)) {
-                    return $unauthorized(415, 'Unsupported file type "' . $content_type . '".');
-                }
-
-                foreach (array_filter($constraints->unsupported_content_types, fn(string $unsupported_content_type) => str_ends_with($unsupported_content_type, '/*')) as $unsupported_content_type) {
-                    list($category, $type) = explode('/', $unsupported_content_type, 2);
-                    if (str_starts_with($content_type, $category . '/')) {
-                        return $unauthorized(415, 'Unsupported file type "' . $content_type . '".');
-                    }
-                }
-            }
-            return true;
-        };
     }
     
     static function fromPath(\nostriphant\NIP01\Key $server_key, string $path, UploadConstraints $constraints) : self {
@@ -62,7 +32,7 @@ readonly class Blossom implements \IteratorAggregate {
         };
         
         yield $wrap('/{hash:\w{64}}[.{ext:\w+}]', new Endpoint\Blob($this->factory));
-        yield $wrap('/upload', new Endpoint\Upload($this->factory, $this->upload_authorized));
-        yield $wrap('/mirror', new Endpoint\Mirror($this->factory, $this->server_key, $this->upload_authorized));
+        yield $wrap('/upload', new Endpoint\Upload($this->factory, $this->upload_constraints));
+        yield $wrap('/mirror', new Endpoint\Mirror($this->factory, $this->server_key, $this->upload_constraints));
     }
 }
