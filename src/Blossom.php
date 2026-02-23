@@ -15,7 +15,7 @@ readonly class Blossom implements \IteratorAggregate {
         }
         $this->factory = $factory;
         
-        $this->upload_authorized = function(string $pubkey_hex, int $content_length, ?string $content_type, callable $unauthorized) use ($constraints, $unsupported_type_checker) : bool|array {
+        $this->upload_authorized = function(string $pubkey_hex, int $content_length, string $content_type, callable $unauthorized) use ($constraints, $unsupported_type_checker) : bool|array {
             if (isset($constraints->allowed_pubkeys)) {
                 if (in_array($pubkey_hex, $constraints->allowed_pubkeys) === false) {
                     return $unauthorized(401, 'Pubkey "' . $pubkey_hex . '" is not allowed to upload files');
@@ -28,7 +28,7 @@ readonly class Blossom implements \IteratorAggregate {
                 }
             }
             
-            if (isset($constraints->unsupported_content_types) && isset($content_type)) {
+            if (isset($constraints->unsupported_content_types)) {
                 if (isset($constraints->unsupported_content_types) === false) {
                 } elseif (in_array($content_type, $constraints->unsupported_content_types)) {
                     return $unauthorized(415, 'Unsupported file type "' . $content_type . '".');
@@ -47,9 +47,6 @@ readonly class Blossom implements \IteratorAggregate {
     
     static function fromPath(\nostriphant\NIP01\Key $server_key, string $path, UploadConstraints $constraints) : self {
         return new self($server_key, new Blob\Factory($path, null, fn() => true), $constraints);
-    }
-    
-    public function __invoke(UploadConstraints $constraints): self {
     }
 
     #[\Override]
