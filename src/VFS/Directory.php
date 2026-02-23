@@ -27,6 +27,7 @@ readonly class Directory extends Node {
             }
         }
         fclose($handle);
+        fclose($stream);
         
         if (hash_file('sha256', $temp) !== $hash) {
             throw new \nostriphant\Blossom\Exception(403, 'Authorized hash does not match mirrored file.');
