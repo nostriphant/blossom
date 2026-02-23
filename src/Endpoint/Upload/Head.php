@@ -20,7 +20,7 @@ readonly class Head extends Put implements \nostriphant\Blossom\Endpoint\Action 
 
     #[\Override]
     public function __invoke(string $pubkey_hex, array $args): array {
-        $blob = parent::__invoke($pubkey_hex, $args);
+        $response = parent::__invoke($pubkey_hex, $args);
 
         return [
             'status' => 200

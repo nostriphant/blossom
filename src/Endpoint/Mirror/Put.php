@@ -46,7 +46,6 @@ readonly class Put implements \nostriphant\Blossom\Endpoint\Action {
 
     #[\Override]
     public function __invoke(string $pubkey_hex, array $args): array {
-        $blob = ($this->blob)($pubkey_hex, $args['handle_remote'], $args['hash']);
-        return $blob();
+        return ($this->blob)($pubkey_hex, $args['handle_remote'], $args['hash']);
     }
 }
