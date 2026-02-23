@@ -125,7 +125,7 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         $mirror_content = '{"url": "'.FeatureCase::RELAY_URL . '/' . $hash.'"}';
         list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', 'http://127.0.0.1:8088/mirror', upload_resource: $mirror_content, authorization:['t' => 'upload', 'x' => $expected_hash]);
         expect($status)->toBe('403', $body);
-        expect($headers['x-reason'])->toBe('Authorized hash does not much mirrored file.');
+        expect($headers['x-reason'])->toBe('Authorized hash does not match mirrored file.');
 
         clearstatcache();
         $hash_file = $blossom->files_directory . '/' . $hash;
