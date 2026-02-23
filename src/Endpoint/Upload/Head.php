@@ -15,15 +15,12 @@ readonly class Head extends Put implements \nostriphant\Blossom\Endpoint\Action 
         $additional_headers['CONTENT_TYPE'] = $additional_headers['X_CONTENT_TYPE'];
         unset($additional_headers['X_CONTENT_TYPE']);
         
-        return  parent::authorize($authorization_event, $additional_headers, $action, $unauthorized);
-    }
+        return parent::authorize($authorization_event, $additional_headers, fn(callable $paction) => $action(function(string $pubkey_hex) use ($paction): array {
+            $response = $paction($pubkey_hex);
 
-    #[\Override]
-    public function __invoke(string $pubkey_hex, array $args): array {
-        $response = parent::__invoke($pubkey_hex, $args);
-
-        return [
-            'status' => 200
-        ];
+            return [
+                'status' => 200
+            ];
+        }), $unauthorized);
     }
 }

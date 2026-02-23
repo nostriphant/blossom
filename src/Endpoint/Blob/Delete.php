@@ -12,16 +12,13 @@ readonly class Delete implements \nostriphant\Blossom\Endpoint\Action {
         } elseif (\nostriphant\NIP01\Event::hasTagValue($authorization_event, 't', 'delete') === false) {
             return $unauthorized(401, '');
         }
-        return $action();
-    }
-    
-    #[\Override]
-    public function __invoke(string $pubkey_hex, array $args) : array {
-        try {
-            \nostriphant\Blossom\Blob::delete($this->blob, $pubkey_hex);
-            return ['status' =>  204];
-        } catch (\nostriphant\Blossom\Exception $e) {
-            return ['status' => $e->getCode(), 'headers' => ['x-reason' => $e->getMessage()]];
-        }
+        return $action(function(string $pubkey_hex) : array {
+            try {
+                \nostriphant\Blossom\Blob::delete($this->blob, $pubkey_hex);
+                return ['status' =>  204];
+            } catch (\nostriphant\Blossom\Exception $e) {
+                return ['status' => $e->getCode(), 'headers' => ['x-reason' => $e->getMessage()]];
+            }
+        });
     }
 }

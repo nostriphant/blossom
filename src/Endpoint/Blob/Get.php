@@ -12,11 +12,6 @@ readonly class Get implements \nostriphant\Blossom\Endpoint\Action {
         } elseif (\nostriphant\NIP01\Event::extractTagValues($authorization_event, 'x')[0][0] !== $this->blob->sha256) {
             return $unauthorized(401, 'x-tag does not match blob sha256 (' . $this->blob->sha256 .')');
         }
-        return $action();
-    }
-    
-    #[\Override]
-    public function __invoke(string $pubkey_hex, array $args) : array {
-        return ($this->blob)();
+        return $action($this->blob);
     }
 }
