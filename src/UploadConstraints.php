@@ -12,7 +12,7 @@ class UploadConstraints {
         
     }
     
-    public function __invoke(string $pubkey_hex, int $content_length, string $content_type, callable $unauthorized) : bool|array {
+    public function __invoke(string $pubkey_hex, int $content_length, string $content_type, callable $authorized, callable $unauthorized) : array {
         if (isset($this->allowed_pubkeys)) {
             if (in_array($pubkey_hex, $this->allowed_pubkeys) === false) {
                 return $unauthorized(401, 'Pubkey "' . $pubkey_hex . '" is not allowed to upload files');
@@ -38,6 +38,6 @@ class UploadConstraints {
                 }
             }
         }
-        return true;
+        return $authorized();
     }
 }

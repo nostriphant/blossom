@@ -40,7 +40,11 @@ readonly class Put implements \nostriphant\Blossom\Endpoint\Action {
         }
         
         $headers = new \nostriphant\Blossom\HTTP\HeaderStruct(http_get_last_response_headers());
-        $result = call_user_func($this->upload_authorized, $authorization_event->pubkey, $headers['content-length'][0] ?? -1, $headers['content-type'][0] ?? '', $unauthorized);
-        return $result === true ? $action(fn(string $pubkey_hex) => ($this->blob)($pubkey_hex, $handle_remote, $hash)) : $result;
+        return call_user_func($this->upload_authorized, 
+                $authorization_event->pubkey, 
+                $headers['content-length'][0] ?? -1, $headers['content-type'][0] ?? '', 
+                fn() => $action(fn(string $pubkey_hex) => ($this->blob)($pubkey_hex, $handle_remote, $hash)),
+                $unauthorized
+        );
     }
 }
