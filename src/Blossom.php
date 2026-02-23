@@ -13,6 +13,8 @@ readonly class Blossom implements \IteratorAggregate {
         if (isset($constraints->max_upload_size)) {
             $factory = Blob\Factory::recreate($factory, max_file_size: $constraints->max_upload_size);
         }
+        $this->factory = $factory;
+        
         $unsupported_type_checker = function(string $content_type) use ($constraints) {
             if (isset($constraints->unsupported_content_types) === false) {
                 return false;
@@ -28,8 +30,6 @@ readonly class Blossom implements \IteratorAggregate {
             }
             return false;
         };
-
-        $this->factory = Blob\Factory::recreate($factory, unsupported_media_types: $unsupported_type_checker);
         
         $this->upload_authorized = function(string $pubkey_hex, int $content_length, ?string $content_type, callable $unauthorized) use ($constraints, $unsupported_type_checker) : bool|array {
             if (isset($constraints->allowed_pubkeys)) {

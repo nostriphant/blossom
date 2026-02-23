@@ -4,10 +4,7 @@ namespace nostriphant\Blossom\Blob;
 
 class Factory {
     
-    private \Closure $unsupported_media_types;
-    
-    public function __construct(private string $path, private ?int $max_file_size, callable $unsupported_media_types) {
-        $this->unsupported_media_types = \Closure::fromCallable($unsupported_media_types);
+    public function __construct(private string $path, private ?int $max_file_size) {
     }
     
     static function recreate(self $factory, mixed ...$new_args) : self {
@@ -19,7 +16,7 @@ class Factory {
             list($action, $hash) = explode(':', $hash, 2);
             return new Uncreated(new \nostriphant\Blossom\VFS\Directory($this->path, $this->max_file_size), $hash);
         } elseif ($hash === "remote") {
-            return new Remote(new \nostriphant\Blossom\VFS\Directory($this->path, $this->max_file_size), $this->unsupported_media_types);
+            return new Remote(new \nostriphant\Blossom\VFS\Directory($this->path, $this->max_file_size));
         }
         return new \nostriphant\Blossom\Blob(new \nostriphant\Blossom\VFS\File($this->path . DIRECTORY_SEPARATOR . $hash));
     }

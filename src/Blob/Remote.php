@@ -10,9 +10,7 @@ class Remote {
     
     public function __invoke(string $pubkey_hex, $handle_remote, string $hash): \nostriphant\Blossom\Blob {
         try {
-            $file = ($this->directory)($pubkey_hex, $handle_remote, $hash);
-            fclose($handle_remote);
-            return new \nostriphant\Blossom\Blob\Created($file);
+            return new \nostriphant\Blossom\Blob\Created(($this->directory)($pubkey_hex, $handle_remote, $hash));
         } catch (\nostriphant\Blossom\Exception $e) {
             return Failed::fromException($e);
         }
