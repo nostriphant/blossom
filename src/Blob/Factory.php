@@ -15,7 +15,7 @@ class Factory {
         if ($hash === 'upload') {
             return new Uncreated(new \nostriphant\Blossom\VFS\Directory($this->path, $this->max_file_size));
         } elseif ($hash === "remote") {
-            return new Remote(new \nostriphant\Blossom\VFS\Directory($this->path, $this->max_file_size));
+            return new Uncreated(new \nostriphant\Blossom\VFS\Directory($this->path, $this->max_file_size));
         }
         return new \nostriphant\Blossom\Blob(new \nostriphant\Blossom\VFS\File($this->path . DIRECTORY_SEPARATOR . $hash));
     }

@@ -6,7 +6,7 @@ readonly class Put implements \nostriphant\Blossom\Endpoint\Action {
 
     private \Closure $upload_authorized;
 
-    public function __construct(callable $upload_authorized, private \nostriphant\Blossom\Blob\Remote $blob, private \nostriphant\NIP01\Key $server_key, private \Traversable $stream) {
+    public function __construct(callable $upload_authorized, private \nostriphant\Blossom\Blob\Uncreated $blob, private \nostriphant\NIP01\Key $server_key, private \Traversable $stream) {
         $this->upload_authorized = \Closure::fromCallable($upload_authorized);
     }
 
