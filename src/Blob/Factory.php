@@ -11,10 +11,8 @@ class Factory {
         return new self(...array_merge(get_object_vars($factory), $new_args));
     }
     
-    public function __invoke(string $hash): mixed {
-        if ($hash === 'upload') {
-            return new Uncreated(new \nostriphant\Blossom\VFS\Directory($this->path, $this->max_file_size));
-        } elseif ($hash === "remote") {
+    public function __invoke(?string $hash): mixed {
+        if (isset($hash) === false) {
             return new Uncreated(new \nostriphant\Blossom\VFS\Directory($this->path, $this->max_file_size));
         }
         return new \nostriphant\Blossom\Blob(new \nostriphant\Blossom\VFS\File($this->path . DIRECTORY_SEPARATOR . $hash));
