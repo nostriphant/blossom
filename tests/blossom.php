@@ -51,7 +51,7 @@ switch ($routeInfo[0]) {
         $response = $routeInfo[1](new \nostriphant\Blossom\HTTP\ServerRequest($headers, $routeInfo[2], $input));
         
         error_log(var_export(array_diff_key($response, ['body' => null]), true));
-        header('HTTP/1.1 ' . ($response['status'] ?? '200'), true);
+        header('HTTP/1.1 ' . $response['status'], true);
         
         $headers = $response['headers'] ?? [];
         array_walk($headers, fn(string $value, string $header) => header($header.': ' .$value));
