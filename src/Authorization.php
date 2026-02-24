@@ -36,6 +36,6 @@ class Authorization {
         }
         
         $action = ($this->action_factory)($request);
-        return $action->authorize($request->authorization, $additional_headers, fn(callable $action) => ($this->handler)($action($request->authorization->pubkey)), $unauthorized);
+        return $action($request->authorization, $additional_headers, fn(callable $action) => ($this->handler)($action($request->authorization->pubkey)), $unauthorized);
     }
 }

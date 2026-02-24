@@ -6,7 +6,7 @@ namespace nostriphant\Blossom\Endpoint\Blob;
 readonly class Delete implements \nostriphant\Blossom\Endpoint\Action {
     public function __construct(private \nostriphant\Blossom\Blob $blob) {}
     
-    public function authorize(\nostriphant\NIP01\Event $authorization_event, array $additional_headers, callable $action, callable $unauthorized) : array {
+    public function __invoke(\nostriphant\NIP01\Event $authorization_event, array $additional_headers, callable $action, callable $unauthorized) : array {
         if (\nostriphant\NIP01\Event::hasTagValue($authorization_event, 'x', $this->blob->sha256) === false) {
             return $unauthorized(401, '');
         } elseif (\nostriphant\NIP01\Event::hasTagValue($authorization_event, 't', 'delete') === false) {

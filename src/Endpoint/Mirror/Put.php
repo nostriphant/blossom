@@ -10,7 +10,7 @@ readonly class Put implements \nostriphant\Blossom\Endpoint\Action {
         $this->upload_authorized = \Closure::fromCallable($upload_authorized);
     }
 
-    public function authorize(\nostriphant\NIP01\Event $authorization_event, array $additional_headers, callable $action, callable $unauthorized) : array {
+    public function __invoke(\nostriphant\NIP01\Event $authorization_event, array $additional_headers, callable $action, callable $unauthorized) : array {
         $body = '';
         foreach ($this->stream as $buffer) {
             $body .= $buffer;
