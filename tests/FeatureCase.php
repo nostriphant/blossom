@@ -5,15 +5,11 @@ namespace nostriphant\BlossomTests;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 
 abstract class FeatureCase extends BaseTestCase
-{
-    const SOCKET = '127.0.0.1:8087';
-    const RELAY_URL = 'http://' . self::SOCKET;
-    const LOG_DIRECTORY = ROOT_DIR . "/logs";
-    
+{   
     static mixed $blossom;
     
     static function request(string $method, string $path, $upload_resource = null, ?array $authorization = null, ?array $headers = []) : array {
-        return \nostriphant\Blossom\request($method, str_starts_with($path, 'http') ? $path : self::RELAY_URL . $path, $upload_resource, $authorization, $headers);
+        return \nostriphant\Blossom\request($method, str_starts_with($path, 'http') ? $path : self::$blossom->url . $path, $upload_resource, $authorization, $headers);
     }
     
     static function writeFile(string $content) : string {
@@ -31,7 +27,7 @@ abstract class FeatureCase extends BaseTestCase
         return $result;
     }
     
-    static function start_blossom(string $socket, string $output = self::LOG_DIRECTORY . "/blossom.log", string $errors = self::LOG_DIRECTORY . "/blossom-errors.log") {
+    static function start_blossom(string $socket, string $output, string $errors) {
         $descriptorspec = [
             0 => ["pipe", "r"],  
             1 => ["file", $output, "w"], 
@@ -52,9 +48,9 @@ abstract class FeatureCase extends BaseTestCase
         fclose($pipes[0]);
         sleep(1);
         
-        return new class($files_path, $process) {
+        return new class($files_path, 'http://' . $socket, $process) {
             
-            public function __construct(public string $files_directory, private $process) {
+            public function __construct(public string $files_directory, public string $url, private $process) {
             
             }
             

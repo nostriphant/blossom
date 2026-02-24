@@ -27,7 +27,7 @@ describe("OPTIONS /mirror", function() {
 
 it('The /mirror endpoint MUST download the blob from the specified URL and verify that there is at least one x tag in the authorization event matching the sha256 hash of the download blob', function () {
 
-    $blossom = FeatureCase::start_blossom('127.0.0.1:8088', FeatureCase::LOG_DIRECTORY . "/blossom-8088.log", FeatureCase::LOG_DIRECTORY . "/blossom-errors-8088.log");
+    $blossom = FeatureCase::start_blossom('127.0.0.1:8088', ROOT_DIR . "/logs/blossom-8088.log", ROOT_DIR . "/logs/blossom-errors-8088.log");
     
     try {
         $contents = 'Hello Wddorld!!!';
@@ -43,7 +43,7 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         expect($status)->toBe('201');
 
         $blob_descriptor = json_decode($body);
-        expect($blob_descriptor->url)->toBe(FeatureCase::RELAY_URL . '/' . $expected_hash);
+        expect($blob_descriptor->url)->toBe(FeatureCase::$blossom->url . '/' . $expected_hash);
         expect($blob_descriptor->sha256)->toBe($expected_hash);
         expect($blob_descriptor->size)->toBe(strlen($contents), $expected_hash);
         expect($blob_descriptor->type)->toBe('text/plain');
@@ -54,7 +54,7 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         expect($status)->toBe('201', $headers['x-reason'] ?? '');
         
         $blob_descriptor = json_decode($body);
-        expect($blob_descriptor->url)->toBe(FeatureCase::RELAY_URL . '/' . $expected_hash);
+        expect($blob_descriptor->url)->toBe(FeatureCase::$blossom->url . '/' . $expected_hash);
         expect($blob_descriptor->sha256)->toBe($expected_hash);
         expect($blob_descriptor->size)->toBe(strlen($contents), $expected_hash);
         expect($blob_descriptor->type)->toBe('text/plain');
@@ -95,7 +95,7 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         is_dir($hash_original_file . '.owners') || mkdir($hash_original_file . '.owners');
         touch($hash_original_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f');
 
-        $mirror_content = '{"url": "'.FeatureCase::RELAY_URL . '/' . $hash.'"}';
+        $mirror_content = '{"url": "'.FeatureCase::$blossom->url . '/' . $hash.'"}';
         list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', 'http://127.0.0.1:8088/mirror', upload_resource: $mirror_content, authorization:['t' => 'upload', 'x' => $hash]);
         expect($status)->toBe('413', $body);
         expect($headers['x-reason'])->toBe('Filesize larger than max allowed file size.');
@@ -122,7 +122,7 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         is_dir($hash_original_file . '.owners') || mkdir($hash_original_file . '.owners');
         touch($hash_original_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f');
 
-        $mirror_content = '{"url": "'.FeatureCase::RELAY_URL . '/' . $hash.'"}';
+        $mirror_content = '{"url": "'.FeatureCase::$blossom->url . '/' . $hash.'"}';
         list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', 'http://127.0.0.1:8088/mirror', upload_resource: $mirror_content, authorization:['t' => 'upload', 'x' => $expected_hash]);
         expect($status)->toBe('403', $body);
         expect($headers['x-reason'])->toBe('Authorized hash does not match mirrored file.');
