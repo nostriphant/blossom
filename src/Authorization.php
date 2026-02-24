@@ -3,10 +3,8 @@
 namespace nostriphant\Blossom;
 
 class Authorization {
-    private \Closure $handler;
     
-    public function __construct(private Endpoint\Action\Factory $action_factory, callable $handler) {
-        $this->handler = \Closure::fromCallable($handler);
+    public function __construct(private Endpoint\Action\Factory $action_factory, private HTTP\AdditionalHeaders $headers) {
     }
     
     public function __invoke(HTTP\ServerRequest $request) : array {
@@ -34,6 +32,6 @@ class Authorization {
         }
         
         $action = ($this->action_factory)($request);
-        return $action($request->authorization, $additional_headers, fn(callable $action) => ($this->handler)($action($request->authorization->pubkey)), $unauthorized);
+        return $action($request->authorization, $additional_headers, fn(callable $action) => ($this->headers)($action($request->authorization->pubkey)), $unauthorized);
     }
 }
