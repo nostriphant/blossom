@@ -3,11 +3,9 @@
 namespace nostriphant\Blossom;
 
 class Authorization {
-    private \Closure $action_factory;
     private \Closure $handler;
     
-    public function __construct(callable $action_factory, callable $handler) {
-        $this->action_factory = \Closure::fromCallable($action_factory);
+    public function __construct(private Endpoint\Action\Factory $action_factory, callable $handler) {
         $this->handler = \Closure::fromCallable($handler);
     }
     
