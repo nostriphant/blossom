@@ -45,6 +45,7 @@ readonly class Blob {
     
     public function __invoke(): array {
         return [
+            'status' => 200,
             'headers' => [ 
                 'Content-Type' => $this->file->type,
                 'Content-Length' => $this->file->size

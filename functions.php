@@ -53,7 +53,7 @@ function request(string $method, string $uri, $upload_resource = null, ?array $a
     if ($raw_response === false) {
         $error = curl_error($curl);
         curl_close($curl);
-        return [null, null, [], $error];
+        throw new \Exception($error);
     }
     $info = curl_getinfo($curl);
     curl_close($curl);
@@ -61,6 +61,11 @@ function request(string $method, string $uri, $upload_resource = null, ?array $a
     
     $headers = new HTTP\HeaderStruct(explode("\r\n", substr($raw_response, 0, $info['header_size'])));
     $response_body = substr($raw_response, $info['header_size']);
+    
+    if (isset($headers['status']) === false) {
+        throw new \Exception(var_export($raw_response, true));
+    }
+    
     return [$headers['protocol'], $headers['status'], $headers, $response_body];
 }
 

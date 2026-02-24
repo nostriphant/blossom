@@ -4,7 +4,7 @@ namespace nostriphant\Blossom;
 
 class Authorization {
     
-    public function __construct(private Endpoint\Action\Factory $action_factory, private HTTP\AdditionalHeaders $headers) {
+    public function __construct(private Endpoint\Action\Factory $action_factory) {
     }
     
     public function __invoke(HTTP\ServerRequest $request) : array {
@@ -32,6 +32,6 @@ class Authorization {
         }
         
         $action = ($this->action_factory)($request);
-        return $action($request->authorization, $additional_headers, fn(callable $action) => ($this->headers)($action($request->authorization->pubkey)), $unauthorized);
+        return $action($request->authorization, $additional_headers, fn(callable $action) => $action($request->authorization->pubkey), $unauthorized);
     }
 }
