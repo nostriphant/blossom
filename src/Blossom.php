@@ -23,7 +23,7 @@ readonly class Blossom implements \IteratorAggregate {
     public function getIterator(): \Traversable {
         $wrap = fn(string $endpoint_path, Endpoint $endpoint) => function(callable $define) use ($endpoint, $endpoint_path) : void {
             $endpoint_methods = [];
-            $endpoint(function(HTTP\Method $method, callable $action_factory) use ($define, $endpoint_path, &$endpoint_methods) {
+            $endpoint(function(HTTP\Method $method, Endpoint\Action\Factory $action_factory) use ($define, $endpoint_path, &$endpoint_methods) {
                 $define($method->name, $endpoint_path, new Authorization($action_factory, new HTTP\AdditionalHeaders));
                 $endpoint_methods[] = $method;
             });
