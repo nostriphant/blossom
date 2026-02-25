@@ -53,6 +53,8 @@ function request(string $method, string $uri, $upload_resource = null, ?array $a
     if ($raw_response === false) {
         $error = curl_error($curl);
         curl_close($curl);
+        sleep(1);
+        return request(...func_get_args());
         throw new \Exception($error);
     }
     $info = curl_getinfo($curl);

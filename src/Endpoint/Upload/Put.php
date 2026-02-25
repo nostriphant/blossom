@@ -6,10 +6,12 @@ use \nostriphant\Functional\Partial;
 
 readonly class Put implements \nostriphant\Blossom\Endpoint\Action {
 
-    private \Closure $upload_authorized;
     
-    public function __construct(callable $upload_authorized, private \nostriphant\Blossom\Blob\Uncreated $blob, private mixed $stream) {
-        $this->upload_authorized = \Closure::fromCallable($upload_authorized);
+    public function __construct(
+            private \nostriphant\Blossom\UploadConstraints $upload_authorized, 
+            private \nostriphant\Blossom\Blob\Uncreated $blob, 
+            private mixed $stream
+    ) {
     }
     
     public function __invoke(\nostriphant\NIP01\Event $authorization_event, array $additional_headers, callable $action, callable $unauthorized) : array {

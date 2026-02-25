@@ -1,13 +1,16 @@
 <?php
 
 namespace nostriphant\Blossom\Endpoint\Mirror;
+use \nostriphant\Functional\Partial;
 
 readonly class Put implements \nostriphant\Blossom\Endpoint\Action {
 
-    private \Closure $upload_authorized;
-
-    public function __construct(callable $upload_authorized, private \nostriphant\Blossom\Blob\Uncreated $blob, private \nostriphant\NIP01\Key $server_key, private \Traversable $stream) {
-        $this->upload_authorized = \Closure::fromCallable($upload_authorized);
+    public function __construct(
+            private \nostriphant\Blossom\UploadConstraints $upload_authorized, 
+            private \nostriphant\Blossom\Blob\Uncreated $blob, 
+            private \nostriphant\NIP01\Key $server_key, 
+            private \Traversable $stream
+    ) {
     }
 
     public function __invoke(\nostriphant\NIP01\Event $authorization_event, array $additional_headers, callable $action, callable $unauthorized) : array {
@@ -40,10 +43,9 @@ readonly class Put implements \nostriphant\Blossom\Endpoint\Action {
         }
         
         $headers = new \nostriphant\Blossom\HTTP\HeaderStruct(http_get_last_response_headers());
-        return $action(fn(string $pubkey_hex) => ($this->upload_authorized)(
-                $pubkey_hex, 
+        return $action(Partial::right($this->upload_authorized,
                 $headers['content-length'][0] ?? -1, $headers['content-type'][0] ?? '', 
-                fn(string $pubkey_hex) => ($this->blob)($pubkey_hex, $handle_remote, $hash),
+                Partial::right($this->blob, $handle_remote, $hash),
                 $unauthorized
         ));
     }

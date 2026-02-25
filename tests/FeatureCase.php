@@ -46,7 +46,6 @@ abstract class FeatureCase extends BaseTestCase
         ]);
 
         fclose($pipes[0]);
-        sleep(1);
         
         return new class($files_path, 'http://' . $socket, $process) {
             
