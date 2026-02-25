@@ -34,4 +34,13 @@ class Authorization {
         $action = ($this->action_factory)($request);
         return $action($request->authorization, $additional_headers, fn(callable $action) => $action($request->authorization->pubkey), $unauthorized);
     }
+    
+    static function makeEvent(\nostriphant\NIP01\Key $key, string $action, string $hash, string $description) : \nostriphant\NIP01\Event {
+        $mirror_authorization_rumor = new \nostriphant\NIP01\Rumor(time(), $key(\nostriphant\NIP01\Key::public()), 24242,  $description, [
+            ['t', $action],
+            ["expiration", time() + 3600],
+            ['x', $hash]
+        ]);
+        return $mirror_authorization_rumor($key);
+    }
 }

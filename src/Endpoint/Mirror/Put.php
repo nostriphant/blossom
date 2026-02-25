@@ -26,12 +26,7 @@ readonly class Put implements \nostriphant\Blossom\Endpoint\Action {
         $url = $json->url;
         
         list($hash, ) = explode('.', basename(parse_url($url, PHP_URL_PATH)));
-        $mirror_authorization_rumor = new \nostriphant\NIP01\Rumor(time(), ($this->server_key)(\nostriphant\NIP01\Key::public()), 24242,  'Mirroring ' . $url, [
-            ['t', 'get'],
-            ["expiration", time() + 3600],
-            ['x', $hash]
-        ]);
-        $mirror_authorization_event = $mirror_authorization_rumor($this->server_key);
+        $mirror_authorization_event = \nostriphant\Blossom\Authorization::makeEvent($this->server_key, 'get', $hash, 'Mirroring ' . $url);
         $headers[] = 'Authorization: Nostr ' . base64_encode(\nostriphant\NIP01\Nostr::encode($mirror_authorization_event()));
         $handle_remote = fopen($url, 'rb', context: stream_context_create(['http' => [
             'method' => 'GET',
