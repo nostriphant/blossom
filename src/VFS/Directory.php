@@ -29,8 +29,9 @@ readonly class Directory extends Node {
         fclose($handle);
         fclose($stream);
         
-        if (hash_file('sha256', $temp) !== $hash) {
-            throw new \nostriphant\Blossom\Exception(403, 'Authorized hash does not match mirrored file.');
+        $actual_hash = hash_file('sha256', $temp);
+        if ($actual_hash !== $hash) {
+            throw new \nostriphant\Blossom\Exception(403, 'Authorized hash ('.$hash.')  does not match hash of contents ('.$actual_hash.'.');
         }
         
         $target_location = $this->path . DIRECTORY_SEPARATOR . $hash;
