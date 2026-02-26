@@ -17,6 +17,9 @@ readonly class HeaderStruct implements \IteratorAggregate, \ArrayAccess {
             if (str_starts_with($response_header, 'HTTP/')) {
                 list($protocol, $status) = explode(' ', $response_header, 2);
                 $headers['protocol'] = [$protocol];
+                if (str_contains($status, ' ')) {
+                    list($status,) = explode(' ', $status, 2);
+                }
                 $headers['status'] = [$status];
                 continue;
             }
