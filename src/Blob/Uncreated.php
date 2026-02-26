@@ -17,13 +17,7 @@ class Uncreated {
                     'Content-Type' => 'application/json',
                     'Content-Location' => '/' . $blob->sha256
                 ],
-                'body' => json_encode([
-                    "url" => $blob->url,
-                    "sha256" => $blob->sha256,
-                    "size" => $blob->size,
-                    "type" => $blob->type,
-                    "uploaded" => $blob->uploaded
-                ])
+                'body' => $blob
             ];
         } catch (\nostriphant\Blossom\Exception $e) {
             return ['status' => $e->getCode(), 'headers' => ['x-reason' => $e->getMessage()]];

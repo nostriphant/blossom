@@ -53,4 +53,14 @@ readonly class Blob {
             'body' => VFS\File::read($this->file)
         ];
     }
+    
+    public function __toString(): string {
+        return json_encode([
+            "url" => $this->url,
+            "sha256" => $this->sha256,
+            "size" => $this->size,
+            "type" => $this->type,
+            "uploaded" => $this->uploaded
+        ]);
+    }
 }
