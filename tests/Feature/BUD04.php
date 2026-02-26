@@ -125,7 +125,7 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         $mirror_content = '{"url": "'.FeatureCase::$blossom->url . '/' . $hash.'"}';
         list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', 'http://127.0.0.1:8088/mirror', upload_resource: $mirror_content, authorization:['t' => 'upload', 'x' => $expected_hash]);
         expect($status)->toBe('403', $body);
-        expect($headers['x-reason'])->toBe('Authorized hash (dccc1450d6fc4232955fcc5cf81105d874c4c6f8c710a71b2763d2c3238e923f)  does not match hash of contents (29f662e3fded284e2695546ef01ede7d4d01f9d28b706d41b65b99ad600154d3.');
+        expect($headers['x-reason'])->toBe('Authorized hash (dccc1450d6fc4232955fcc5cf81105d874c4c6f8c710a71b2763d2c3238e923f)  does not match hash of contents (29f662e3fded284e2695546ef01ede7d4d01f9d28b706d41b65b99ad600154d3).');
 
         clearstatcache();
         $hash_file = $blossom->files_directory . '/' . $hash;
