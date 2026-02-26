@@ -16,11 +16,14 @@ readonly class HeaderStruct implements \IteratorAggregate, \ArrayAccess {
         foreach(array_filter($response_headers) as $response_header) {
             if (str_starts_with($response_header, 'HTTP/')) {
                 list($protocol, $status) = explode(' ', $response_header, 2);
-                $headers['protocol'] = [$protocol];
                 if (str_contains($status, ' ')) {
                     list($status,) = explode(' ', $status, 2);
+                } elseif ($status === '100') {
+                    continue;
                 }
+                
                 $headers['status'] = [$status];
+                $headers['protocol'] = [$protocol];
                 continue;
             }
             

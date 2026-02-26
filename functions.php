@@ -10,6 +10,25 @@ function request(string $method, string $uri, $upload_resource = null, ?array $a
     curl_setopt($curl, CURLOPT_HEADER, true);
     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
     
+    if (isset($authorization)) {
+        $sender_key = Key::fromHex($authorization['key'] ?? 'a71a415936f2dd70b777e5204c57e0df9a6dffef91b3c78c1aa24e54772e33c3');
+        unset($authorization['key']);
+        $sender_pubkey = $authorization['pubkey'] ?? $sender_key(Key::public()); // 15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f
+        unset($authorization['pubkey']);
+        
+        $tags = [];
+        if (isset($authorization['expiration']) === false) {
+            $tags[] = ["expiration", time() + 3600];
+        }
+        foreach ($authorization as $tag => $value) {
+            $tags[] = [$tag, $value];
+        }
+        
+        $authorization_rumor = new \nostriphant\NIP01\Rumor(time(), $sender_pubkey, 24242, $method . ' ' . $uri, $tags);
+        $authorization_event = $authorization_rumor($sender_key);
+        $headers[] = 'Authorization: Nostr ' . base64_encode(\nostriphant\NIP01\Nostr::encode($authorization_event()));
+    }
+    
     switch ($method) {
         case 'HEAD':
             curl_setopt($curl, CURLOPT_NOBODY, true);
@@ -29,25 +48,6 @@ function request(string $method, string $uri, $upload_resource = null, ?array $a
             break;
 
     }
-    
-    if (isset($authorization)) {
-        $sender_key = Key::fromHex($authorization['key'] ?? 'a71a415936f2dd70b777e5204c57e0df9a6dffef91b3c78c1aa24e54772e33c3');
-        unset($authorization['key']);
-        $sender_pubkey = $authorization['pubkey'] ?? $sender_key(Key::public()); // 15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f
-        unset($authorization['pubkey']);
-        
-        $tags = [];
-        if (isset($authorization['expiration']) === false) {
-            $tags[] = ["expiration", time() + 3600];
-        }
-        foreach ($authorization as $tag => $value) {
-            $tags[] = [$tag, $value];
-        }
-        
-        $authorization_rumor = new \nostriphant\NIP01\Rumor(time(), $sender_pubkey, 24242, $method . ' ' . $uri, $tags);
-        $authorization_event = $authorization_rumor($sender_key);
-        $headers[] = 'Authorization: Nostr ' . base64_encode(\nostriphant\NIP01\Nostr::encode($authorization_event()));
-    }
     curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
     $raw_response = curl_exec($curl);
     if ($raw_response === false) {
@@ -55,7 +55,6 @@ function request(string $method, string $uri, $upload_resource = null, ?array $a
         curl_close($curl);
         sleep(1);
         return request(...func_get_args());
-        throw new \Exception($error);
     }
     $info = curl_getinfo($curl);
     curl_close($curl);
