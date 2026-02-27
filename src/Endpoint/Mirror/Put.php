@@ -40,7 +40,7 @@ readonly class Put implements \nostriphant\Blossom\Endpoint\Action {
         $headers = new \nostriphant\Blossom\HTTP\HeaderStruct(http_get_last_response_headers());
         return $action(Partial::right($this->upload_authorized,
                 $headers['content-length'][0] ?? -1, $headers['content-type'][0] ?? '', 
-                Partial::right($this->blob, $handle_remote, $hash),
+                Partial::right($this->blob, $handle_remote, $hash, $url),
                 $unauthorized
         ));
     }

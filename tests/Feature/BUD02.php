@@ -46,7 +46,7 @@ it('The PUT /upload endpoint MUST accept binary data in the body of the request'
     $blob_descriptor = json_decode($body);
     expect($blob_descriptor->url)->toBe(FeatureCase::$blossom->url . '/' . $expected_hash);
     expect($blob_descriptor->sha256)->toBe($expected_hash);
-    expect($blob_descriptor->size)->toBe(14);
+    expect($blob_descriptor->size)->toBe(14, $body);
     expect($blob_descriptor->type)->toBe('text/plain');
     expect($blob_descriptor->uploaded)->toBeInt();
 

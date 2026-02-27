@@ -41,6 +41,7 @@ readonly class Directory extends Node {
             mkdir($target_location . '.owners');
         }
         
+        is_file($temp) === false || unlink($temp);
         touch($target_location . '.owners' . DIRECTORY_SEPARATOR . $pubkey_owner);
         return new File($target_location);
     }

@@ -8,15 +8,19 @@ readonly class Blossom implements \IteratorAggregate {
     
     private Blob\Factory $factory;
     
-    public function __construct(private \nostriphant\NIP01\Key $server_key, Blob\Factory $factory, private UploadConstraints $upload_constraints) {
-        if (isset($upload_constraints->max_upload_size)) {
-            $factory = Blob\Factory::recreate($factory, max_file_size: $upload_constraints->max_upload_size);
-        }
-        $this->factory = $factory;
+    public function __construct(private \nostriphant\NIP01\Key $server_key, string $path, string $server_url, private UploadConstraints $upload_constraints) {
+        $this->factory = new Blob\Factory($path, function(string $hash, ?string $uri = null) use ($server_url) {
+            static $urls = [];
+            if (isset($uri)) {
+                $urls[$hash] = $uri;
+            } elseif (isset($urls[$hash]) === false) {
+                $urls[$hash] = $server_url . '/' . $hash;
+            }
+            return $urls[$hash];
+        }, $upload_constraints->max_upload_size);
     }
     
     static function fromPath(\nostriphant\NIP01\Key $server_key, string $path, UploadConstraints $constraints) : self {
-        return new self($server_key, new Blob\Factory($path, null, fn() => true), $constraints);
     }
 
     #[\Override]

@@ -18,7 +18,7 @@ readonly class Put implements \nostriphant\Blossom\Endpoint\Action {
         return $action(Partial::right($this->upload_authorized,
                 $additional_headers['CONTENT_LENGTH'] ?? -1, 
                 $additional_headers['CONTENT_TYPE'] ?? "application/octet-stream", 
-                Partial::right($this->blob, $this->stream, \nostriphant\NIP01\Event::extractTagValues($authorization_event, 'x')[0][0]),
+                Partial::right($this->blob, $this->stream, \nostriphant\NIP01\Event::extractTagValues($authorization_event, 'x')[0][0], null),
                 $unauthorized
         ));
     }

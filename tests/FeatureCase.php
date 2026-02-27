@@ -39,7 +39,9 @@ abstract class FeatureCase extends BaseTestCase
         $files_path = \nostriphant\Blossom\data_directory() . DIRECTORY_SEPARATOR . $files_directory;
         is_dir($files_path) || mkdir($files_path);
     
+        $url = 'http://' . $socket;
         $process = proc_open([PHP_BINARY, '-S', $socket, './tests/blossom.php'], $descriptorspec, $pipes, ROOT_DIR, [
+            'BLOSSOM_SERVER_URL' => $url,
             'BLOSSOM_ALLOWED_PUBKEYS' => '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f',
             'FILES_DIRECTORY' => $files_directory,
             'MAX_CONTENT_LENGTH' => 100
@@ -47,7 +49,7 @@ abstract class FeatureCase extends BaseTestCase
 
         fclose($pipes[0]);
         
-        return new class($files_path, 'http://' . $socket, $process) {
+        return new class($files_path, $url, $process) {
             
             public function __construct(public string $files_directory, public string $url, private $process) {
             
@@ -55,7 +57,6 @@ abstract class FeatureCase extends BaseTestCase
             
             public function __invoke($remove_files = true) {
                 proc_terminate($this->process);
-                sleep(1);
                 proc_close($this->process);
                 
                 if ($remove_files) {

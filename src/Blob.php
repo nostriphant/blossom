@@ -6,16 +6,17 @@ namespace nostriphant\Blossom;
 readonly class Blob {
     
     public bool $exists;
-    public string $url;
     public int $uploaded;
     public array $owners;
     
-    public function __construct(private VFS\File $file) {
+    public function __construct(private VFS\File $file, public string $url) {
         $this->exists = $file->exists;
         if ($file->exists) {
-            $this->url = "http://127.0.0.1:8087/" . $this->file->sha256;
             $this->uploaded = $file->created;
             $this->owners = array_map('basename', glob($file->path . '.owners/*'));
+        } else {
+            $this->uploaded = 0;
+            $this->owners = [];
         }
     }
     

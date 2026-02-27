@@ -8,7 +8,7 @@ $dotenv->safeLoad();
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) { 
     $server_key = nostriphant\NIP01\Key::generate();
     
-    $blossom = \nostriphant\Blossom\Blossom::fromPath($server_key, \nostriphant\BlossomTests\files_directory(), new \nostriphant\Blossom\UploadConstraints(
+    $blossom = new \nostriphant\Blossom\Blossom($server_key, \nostriphant\BlossomTests\files_directory(), $_ENV['BLOSSOM_SERVER_URL'], new \nostriphant\Blossom\UploadConstraints(
             explode(',', $_ENV['BLOSSOM_ALLOWED_PUBKEYS']),
             $_ENV['MAX_CONTENT_LENGTH'],
             ['video/x-msvideo', 'audio/*']
