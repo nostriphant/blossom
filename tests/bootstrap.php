@@ -24,8 +24,3 @@ function destroy_directories($path) {
         }
     }
 }
-
-function destroy_files_directory() {
-    destroy_directories(files_directory());
-    return (is_dir(files_directory()) === false || rmdir(files_directory())) && \nostriphant\Blossom\destroy_data_directory();
-}

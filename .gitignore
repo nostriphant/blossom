@@ -3,5 +3,5 @@
 /nbproject/private/
 /vendor
 /logs
-/data
+/data*
 /.phpunit.cache

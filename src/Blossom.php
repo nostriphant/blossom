@@ -8,8 +8,10 @@ readonly class Blossom implements \IteratorAggregate {
     
     private Blob\Factory $factory;
     
-    public function __construct(private \nostriphant\NIP01\Key $server_key, string $path, string $server_url, private UploadConstraints $upload_constraints) {
-        $this->factory = new Blob\Factory($path, function(string $hash, ?string $uri = null) use ($server_url) {
+    public function __construct(private \nostriphant\NIP01\Key $server_key, string $data_path, string $server_url, private UploadConstraints $upload_constraints) {
+        $files_directory = $data_path . '/files';
+        is_dir($files_directory) || mkdir($files_directory);
+        $this->factory = new Blob\Factory($files_directory, function(string $hash, ?string $uri = null) use ($server_url) {
             static $urls = [];
             if (isset($uri)) {
                 $urls[$hash] = $uri;

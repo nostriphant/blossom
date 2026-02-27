@@ -12,21 +12,6 @@ abstract class FeatureCase extends BaseTestCase
         return \nostriphant\Blossom\request($method, str_starts_with($path, 'http') ? $path : self::$blossom->url . $path, $upload_resource, $authorization, $headers);
     }
     
-    static function writeFile(string $content) : string {
-        $directory = files_directory();
-        $hash = \nostriphant\Blossom\writeFile($directory, $content);
-        expect($directory . DIRECTORY_SEPARATOR . $hash)->toBeFile();
-        expect(file_get_contents($directory . DIRECTORY_SEPARATOR . $hash))->toBe($content);
-        return $hash;
-    }
-    static function deleteFile(string $hash) : bool {
-        $directory = files_directory();
-        $result = \nostriphant\Blossom\deleteFile($directory, $hash);
-        expect($result)->toBeTrue();
-        expect($directory . DIRECTORY_SEPARATOR . $hash)->not()->toBeFile();
-        return $result;
-    }
-    
     static function start_blossom(string $socket, string $output, string $errors) {
         $descriptorspec = [
             0 => ["pipe", "r"],  
@@ -35,21 +20,20 @@ abstract class FeatureCase extends BaseTestCase
         ];
         
         list($host, $port) = explode(':', $socket, 2);
-        $files_directory = 'files-' . $port;
-        $files_path = \nostriphant\Blossom\data_directory() . DIRECTORY_SEPARATOR . $files_directory;
-        is_dir($files_path) || mkdir($files_path);
+        $data_directory = \nostriphant\Blossom\data_directory() . '-' . $port;
+        is_dir($data_directory) || mkdir($data_directory);
     
         $url = 'http://' . $socket;
         $process = proc_open([PHP_BINARY, '-S', $socket, './tests/blossom.php'], $descriptorspec, $pipes, ROOT_DIR, [
             'BLOSSOM_SERVER_URL' => $url,
+            'BLOSSOM_DATA_DIRECTORY' => $data_directory,
             'BLOSSOM_ALLOWED_PUBKEYS' => '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f',
-            'FILES_DIRECTORY' => $files_directory,
             'MAX_CONTENT_LENGTH' => 100
         ]);
 
         fclose($pipes[0]);
         
-        return new class($files_path, $url, $process) {
+        return new class($data_directory . DIRECTORY_SEPARATOR . 'files', $url, $process) {
             
             public function __construct(public string $files_directory, public string $url, private $process) {
             
@@ -61,7 +45,9 @@ abstract class FeatureCase extends BaseTestCase
                 
                 if ($remove_files) {
                     destroy_directories($this->files_directory);
-                    return is_dir($this->files_directory) && rmdir($this->files_directory);
+                    is_dir($this->files_directory) && rmdir($this->files_directory);
+                    $data_directory = dirname($this->files_directory);
+                    return is_dir($data_directory) && rmdir($data_directory);
                 }
             }
         };
