@@ -44,7 +44,7 @@ abstract class FeatureCase extends BaseTestCase
                 proc_close($this->process);
                 
                 if ($remove_files) {
-                    destroy_directories($this->files_directory);
+                    \nostriphant\Blossom\destroy_directories($this->files_directory);
                     is_dir($this->files_directory) && rmdir($this->files_directory);
                     $data_directory = dirname($this->files_directory);
                     return is_dir($data_directory) && rmdir($data_directory);
