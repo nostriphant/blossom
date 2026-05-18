@@ -60,5 +60,6 @@ readonly class Blossom implements \IteratorAggregate {
         yield $wrap('/upload', new Endpoint\Upload($this->factory, $this->upload_constraints));
         yield $wrap('/media', new Endpoint\Media($this->factory, $this->upload_constraints));
         yield $wrap('/mirror', new Endpoint\Mirror($this->factory, $this->server_key, $this->upload_constraints));
+        yield $wrap('/', new Endpoint\Root());
     }
 }

@@ -38,6 +38,17 @@ describe("OPTIONS /<sha-256>", function() {
 });
 
 
+it('GET|HEAD / gives 200 OK', function () {
+    list($protocol, $status, $headers, $body) = FeatureCase::request('HEAD', '/');
+    expect($status)->toBe('200');
+    expect($body)->toBeEmpty();
+    
+    list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/');
+    expect($status)->toBe('200');
+    expect($body)->toBeEmpty();
+});
+
+
 it('GET /<sha-256> without authorization', function () {
     $hash = \nostriphant\Blossom\writeFile(FeatureCase::$blossom->files_directory, 'Hello World!');
     list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $hash);
