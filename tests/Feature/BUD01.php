@@ -48,6 +48,30 @@ it('GET /<sha-256> without authorization', function () {
     \nostriphant\Blossom\deleteFile(FeatureCase::$blossom->files_directory, $hash);
 });
 
+
+it('GET /<sha-256> returns proper content-type', function () {
+    $im = @\imagecreate(110, 20)
+        or die("Cannot Initialize new GD image stream");
+    $background_color = \imagecolorallocate($im, 0, 0, 0);
+    $text_color = \imagecolorallocate($im, 233, 14, 91);
+    \imagestring($im, 1, 5, 5,  "A Simple Text String", $text_color);
+    $directory = FeatureCase::$blossom->files_directory;
+    
+    $tempfile = tempnam($directory, 'tmp.');
+    \imagepng($im, $tempfile);
+    $hash = hash_file('sha256', $tempfile);
+    rename($tempfile, $directory . DIRECTORY_SEPARATOR . $hash);
+
+    list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $hash);
+    expect($status)->toBe('200');
+    expect($headers['content-type'])->toContain('image/png');
+    expect($headers['access-control-allow-origin'])->toBe('*');
+    expect($body)->toBe(file_get_contents($directory . DIRECTORY_SEPARATOR . $hash));
+    
+    \nostriphant\Blossom\deleteFile(FeatureCase::$blossom->files_directory, $hash);
+});
+
+
 it('GET /<sha-256>', function () {
     $hash = \nostriphant\Blossom\writeFile(FeatureCase::$blossom->files_directory, 'Hello World!');
     list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/' . $hash, authorization: ['t' => 'get', 'x' => $hash]);

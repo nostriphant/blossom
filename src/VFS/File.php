@@ -13,7 +13,9 @@ readonly class File extends Node {
         parent::__construct($path);
         $this->sha256 = basename($path);
         if ($this->exists) {
-            $this->type = 'text/plain';
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $this->type = finfo_file($finfo, $path);
+            finfo_close($finfo);
             $this->size = filesize($this->path);
         } else {
             $this->type = null;
