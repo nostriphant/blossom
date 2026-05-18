@@ -14,11 +14,7 @@ class Factory {
         return new self(...array_merge(get_object_vars($factory), $new_args));
     }
     
-    public function __invoke(?string $pubkey): mixed {
-        if (isset($pubkey) === false) {
-            throw new \nostriphant\Blossom\Exception(400, 'Pubkey missing');
-        }
-        
+    public function __invoke(string $pubkey): mixed {
         $blobs = [];
         foreach (glob($this->files_directory . '/*.owners/' . $pubkey) as $matched_pubkey) {
             $directory = dirname($matched_pubkey);
