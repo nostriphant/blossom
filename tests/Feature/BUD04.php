@@ -7,7 +7,7 @@ use \nostriphant\BlossomTests\FeatureCase;
     
 describe("OPTIONS /mirror", function() {
     it('For preflight (OPTIONS) requests, servers MUST also set, at minimum, the Access-Control-Allow-Headers: Authorization, * and Access-Control-Allow-Methods: PUT headers.', function () {
-        $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!');
+        $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!##');
         list($protocol, $status, $headers, $body) = FeatureCase::request('OPTIONS', '/upload');
         expect($status)->toBe('204');
         expect($headers['access-control-allow-origin'])->toBe('Authorization, *');
@@ -18,7 +18,7 @@ describe("OPTIONS /mirror", function() {
     });
 
     it('The header Access-Control-Max-Age: 86400 MAY be set to cache the results of a preflight request for 24 hours.', function () {
-        $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!');
+        $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!##');
         list($protocol, $status, $headers, $body) = FeatureCase::request('OPTIONS', '/upload');
         expect($headers['access-control-max-age'])->toBe('86400');
         \nostriphant\Blossom\deleteFile(FILES_DIRECTORY, $hash);
@@ -30,7 +30,7 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
     $blossom = FeatureCase::start_blossom('127.0.0.1:8088', ROOT_DIR . "/logs/blossom-8088.log", ROOT_DIR . "/logs/blossom-errors-8088.log");
     
     try {
-        $contents = 'Hello Wddorld!!!';
+        $contents = 'Hello Wddorld!!!###';
         
         $resource = tmpfile();
         fwrite($resource, $contents);

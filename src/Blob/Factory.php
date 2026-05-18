@@ -16,7 +16,7 @@ class Factory {
     
     public function __invoke(?string $hash): mixed {
         if (isset($hash) === false) {
-            return new Uncreated(new \nostriphant\Blossom\VFS\Directory($this->path, $this->max_file_size), $this->url_register);
+            return new Uncreated(new \nostriphant\Blossom\VFS\Directory($this->path), $this->url_register, $this->max_file_size);
         }
         $file = new \nostriphant\Blossom\VFS\File($this->path . DIRECTORY_SEPARATOR . $hash);
         $uri = ($this->url_register)($hash);

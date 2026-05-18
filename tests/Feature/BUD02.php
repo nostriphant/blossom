@@ -31,6 +31,11 @@ it('The PUT /upload endpoint MUST accept binary data in the body of the request'
     
     $hash_file = FILES_DIRECTORY . DIRECTORY_SEPARATOR . $hash;
     
+    
+    list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/list/15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f', upload_resource: $resource, authorization:['t' => 'upload', 'x' => $hash]);
+    expect($status)->toBe('200');
+    
+    
     list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', '/upload', upload_resource: tmpfile(), authorization:['t' => 'upload', 'x' => $hash, 'key' => '6eeb5ad99e47115467d096e07c1c9b8b41768ab53465703f78017204adc5b0cc']);
     expect($status)->toBe('401');
 
@@ -54,6 +59,21 @@ it('The PUT /upload endpoint MUST accept binary data in the body of the request'
     expect($headers['content-location'])->toBe('/' . $expected_hash);
     expect((int)$headers['content-length'])->toBe(strlen($body));
     expect($headers['access-control-allow-origin'])->toBe('*');
+    
+    
+    list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/list/15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f', upload_resource: $resource, authorization:['t' => 'upload', 'x' => $hash]);
+    expect($status)->toBe('200');
+    
+    $expected_hash = hash('sha256', 'Hello World!!!');
+    $blob_descriptors = json_decode($body);
+    expect($blob_descriptors)->not()->toBeNull($body);
+    
+    expect($blob_descriptors[0]->url)->toBe(FeatureCase::$blossom->url . '/' . $expected_hash);
+    expect($blob_descriptors[0]->sha256)->toBe($expected_hash);
+    expect($blob_descriptors[0]->size)->toBe(14, $body);
+    expect($blob_descriptors[0]->type)->toBe('text/plain');
+    expect($blob_descriptors[0]->uploaded)->toBeInt();
+    
     
     expect($hash_file)->toBeFile();
     expect($hash_file . '.owners')->toBeDirectory();

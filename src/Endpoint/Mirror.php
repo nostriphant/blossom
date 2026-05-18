@@ -12,6 +12,6 @@ readonly class Mirror implements \nostriphant\Blossom\Endpoint {
     
     #[\Override]
     public function __invoke(callable $define): void {
-        $define(\nostriphant\Blossom\HTTP\Method::PUT, ($this->factory)(Mirror\Put::class));
+        $define(\nostriphant\Blossom\HTTP\Method::PUT, true, ($this->factory)(Mirror\Put::class));
     }
 }

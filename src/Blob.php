@@ -3,7 +3,7 @@
 
 namespace nostriphant\Blossom;
 
-readonly class Blob {
+readonly class Blob implements \JsonSerializable {
     
     public bool $exists;
     public int $uploaded;
@@ -55,13 +55,17 @@ readonly class Blob {
         ];
     }
     
-    public function __toString(): string {
-        return json_encode([
+    public function jsonSerialize(): mixed {
+        return [
             "url" => $this->url,
             "sha256" => $this->sha256,
             "size" => $this->size,
             "type" => $this->type,
             "uploaded" => $this->uploaded
-        ]);
+        ];
+    }
+    
+    public function __toString(): string {
+        return json_encode($this->jsonSerialize());
     }
 }

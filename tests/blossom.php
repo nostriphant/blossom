@@ -8,9 +8,10 @@ $dotenv->safeLoad();
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) { 
     $server_key = nostriphant\NIP01\Key::generate();
     
-    $blossom = new \nostriphant\Blossom\Blossom($server_key, $_ENV['BLOSSOM_DATA_DIRECTORY'], $_ENV['BLOSSOM_SERVER_URL'], new \nostriphant\Blossom\UploadConstraints(
-            explode(',', $_ENV['BLOSSOM_ALLOWED_PUBKEYS']),
-            $_ENV['MAX_CONTENT_LENGTH'],
+    $browser_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . $_SERVER['HTTP_HOST'];
+    $blossom = new \nostriphant\Blossom\Blossom($server_key, $_ENV['BLOSSOM_DATA_DIRECTORY'] ?? ROOT_DIR . '/data', $_ENV['BLOSSOM_SERVER_URL'] ?? $browser_url, new \nostriphant\Blossom\UploadConstraints(
+            explode(',', $_ENV['BLOSSOM_ALLOWED_PUBKEYS'] ?? ''),
+            $_ENV['MAX_CONTENT_LENGTH'] ?? 100,
             ['video/x-msvideo', 'audio/*']
     ));
     

@@ -72,6 +72,7 @@ function request(string $method, string $uri, $upload_resource = null, ?array $a
 
 function writeFile(string $directory, string $content) : string {
     $hash = hash('sha256', $content);
+    is_dir($directory) || mkdir($directory, recursive:true);
     file_put_contents($directory . DIRECTORY_SEPARATOR . $hash, $content);
     return $hash;
 }

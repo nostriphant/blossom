@@ -39,7 +39,7 @@
     },
     "scripts": {
         "test": [
-            "rm -rf ./data/files/*",
+            "rm -rf ./data ./data-*",
             "./vendor/bin/pest"
         ]
     }

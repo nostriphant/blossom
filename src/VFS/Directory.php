@@ -4,7 +4,7 @@ namespace nostriphant\Blossom\VFS;
 
 readonly class Directory extends Node {
     
-    public function __construct(string $path, public int $max_file_size) {
+    public function __construct(string $path) {
         parent::__construct($path);
     }
     
@@ -12,22 +12,21 @@ readonly class Directory extends Node {
         return new self(dirname($file->path));
     }
     
-    public function __invoke(string $pubkey_owner, $stream, string $hash) : File {
+    public function __invoke(string $pubkey_owner, callable $stream, string $hash) : File {
         $temp = tempnam($this->path, "buffer.");
         
-        $written = 0;
-        $handle = fopen($temp, 'wb');
-        while (feof($stream) === false) {
-            $buffer = fread($stream, 1024);
-            $written += fwrite($handle, $buffer);
-            if ($written > $this->max_file_size) {
-                fclose($handle);
-                unlink($temp);
-                throw new \nostriphant\Blossom\Exception(413, 'Filesize larger than max allowed file size.');
+        try {
+            $written = 0;
+            $handle = fopen($temp, 'wb');
+            while (($buffer = $stream($written)) !== false) {
+                $written += fwrite($handle, $buffer);
             }
+        } catch (\Exception $e) {
+            unlink($temp);
+            throw $e;
+        } finally {
+            fclose($handle);
         }
-        fclose($handle);
-        fclose($stream);
         
         $actual_hash = hash_file('sha256', $temp);
         if ($actual_hash !== $hash) {
