@@ -14,13 +14,16 @@ class Factory {
         return new self(...array_merge(get_object_vars($factory), $new_args));
     }
     
-    public function __invoke(string $pubkey): mixed {
+    public function __invoke(string $pubkey, ?int $limit): mixed {
         $blobs = [];
         foreach (glob($this->files_directory . '/*.owners/' . $pubkey) as $matched_pubkey) {
             $directory = dirname($matched_pubkey);
             $hash = basename($directory, '.owners');
             
             $blobs[] = new \nostriphant\Blossom\Blob(new \nostriphant\Blossom\VFS\File(dirname($directory) . '/'. $hash), ($this->url_register)($hash));
+            if (count($blobs) === $limit) {
+                break;
+            }
         }
         return $blobs;
     }

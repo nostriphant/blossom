@@ -50,8 +50,14 @@ it('The GET /list/15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb
     expect($status)->toBe('200');
     
     $blob_descriptors = json_decode($body);
-    expect($blob_descriptors)->not()->toBeNull($body);
     expect($blob_descriptors)->toHaveCount(count($files));
+    
+    
+    list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/list/15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f?limit=50');
+    expect($status)->toBe('200');
+    
+    $blob_descriptors = json_decode($body);
+    expect($blob_descriptors)->toHaveCount(50);
     
     foreach ($files as $hash_file) {
         unlink($hash_file . '.owners/15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f');
