@@ -45,6 +45,8 @@ it('The GET /list/15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb
         $files[] = $hash_file;
     }
     
+    sort($files);
+    
     
     list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/list/15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f');
     expect($status)->toBe('200');
@@ -58,6 +60,20 @@ it('The GET /list/15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb
     
     $blob_descriptors = json_decode($body);
     expect($blob_descriptors)->toHaveCount(50);
+    
+    $cursor = basename($files[9]);
+    
+    list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/list/15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f?limit=50&cursor=' . $cursor);
+    expect($status)->toBe('200');
+    
+    $blob_descriptors = json_decode($body);
+    expect($blob_descriptors)->toHaveCount(50);
+    
+    foreach (array_slice($files, 10, 50) as $i => $expected_file) {
+        expect($blob_descriptors[$i]->sha256)->toBe(basename($expected_file));
+    }
+    
+    
     
     foreach ($files as $hash_file) {
         unlink($hash_file . '.owners/15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f');

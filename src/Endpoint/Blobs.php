@@ -6,7 +6,7 @@ readonly class Blobs implements \nostriphant\Blossom\Endpoint {
     private Factory $factory;
     
     public function __construct(\nostriphant\Blossom\Blobs\Factory $list_factory) {
-        $this->factory = new Factory(fn(\nostriphant\Blossom\HTTP\ServerRequest $request) => [$list_factory($request->attributes['pubkey'], $request->attributes['limit'] ?? null)]);
+        $this->factory = new Factory(fn(\nostriphant\Blossom\HTTP\ServerRequest $request) => [$list_factory($request->attributes['pubkey'], $request->attributes['limit'] ?? null, $request->attributes['cursor'] ?? null)]);
     }
     
     
