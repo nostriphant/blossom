@@ -73,19 +73,19 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         list($protocol, $status, $headers, $body) = FeatureCase::request('DELETE', $blossom->url . '/' . $blob_descriptor->sha256, authorization:['t' => 'delete', 'x' => $expected_hash]);
         expect($status)->toBe('204');
         expect($headers['access-control-allow-origin'])->toBe('*');
+        
+        
+        list($protocol, $status, $headers, $body) = FeatureCase::request('DELETE', '/' . $blob_descriptor->sha256, authorization:['t' => 'delete', 'x' => $expected_hash]);
+        expect($status)->toBe('204');
 
         clearstatcache();
         expect($hash_file)->not()->toBeFile();
         expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
         expect(glob($hash_file . '.owners/*'))->toHaveCount(0);
         expect($hash_file . '.owners')->not()->toBeDirectory();
-    } catch (\Exception $e) {
-        $blossom(false);
-        throw $e;
-    }
-    
-    
-    try {
+        
+        
+        
         $contents = 'Hello Wddodsdfsdfdsfrld!!!';
         
         $resource = tmpfile();
@@ -124,6 +124,11 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         expect($hash_file)->toBeFile();
         expect($hash_file . '.owners')->toBeDirectory();
         expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->toBeFile();
+        
+        
+        list($protocol, $status, $headers, $body) = FeatureCase::request('DELETE', '/' . $blob_descriptor->sha256, authorization:['t' => 'delete', 'x' => $expected_hash]);
+        expect($status)->toBe('204');
+
 
         list($protocol, $status, $headers, $body) = FeatureCase::request('DELETE', $blossom->url . '/' . $blob_descriptor->sha256, authorization:['t' => 'delete', 'x' => $expected_hash]);
         expect($status)->toBe('204');
@@ -134,14 +139,9 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
         expect($hash_file . '.owners')->not()->toBeDirectory();
         
-    } catch (\Exception $e) {
-        $blossom(false);
-        throw $e;
-    }
-    
-    
-    
-    try {
+        
+        
+        
         $contents = str_repeat('bbb', 100);
         $hash ??= hash('sha256', $contents);
         $content_length ??= strlen($contents);
@@ -156,19 +156,17 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         expect($status)->toBe('413', $body);
         expect($headers['x-reason'])->toBe('Filesize larger than max allowed file size.');
 
+        \nostriphant\Blossom\deleteFile($blossom->files_directory, $hash);
+        
         clearstatcache();
         $hash_file = $blossom->files_directory . '/' . $hash;
         expect($hash_file)->not()->toBeFile();
         expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
         expect(glob($hash_file . '.owners/*'))->toHaveCount(0);
         expect($hash_file . '.owners')->not()->toBeDirectory();
-    } catch (\Exception $e) {
-        $blossom(false);
-        throw $e;
-    }
-    
-    
-    try {
+
+        
+        
         $contents = str_repeat('ddd', 20);
         $hash ??= hash('sha256', $contents);
         $content_length ??= strlen($contents);
@@ -183,8 +181,10 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         expect($status)->toBe('403', $body);
         expect($headers['x-reason'])->toBe('Authorized hash (dccc1450d6fc4232955fcc5cf81105d874c4c6f8c710a71b2763d2c3238e923f)  does not match hash of contents (29f662e3fded284e2695546ef01ede7d4d01f9d28b706d41b65b99ad600154d3).');
 
-        clearstatcache();
+        \nostriphant\Blossom\deleteFile(FILES_DIRECTORY, $hash);
+        
         $hash_file = $blossom->files_directory . '/' . $hash;
+        clearstatcache();
         expect($hash_file)->not()->toBeFile();
         expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
         expect(glob($hash_file . '.owners/*'))->toHaveCount(0);

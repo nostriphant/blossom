@@ -14,5 +14,13 @@ function writeFile(string $directory, string $content, ?string $owning_pubkey = 
     return $hash;
 }
 function deleteFile(string $directory, string $hash) : bool {
-    return unlink($directory . DIRECTORY_SEPARATOR . $hash);
+    $hash_file = $directory . DIRECTORY_SEPARATOR . $hash;
+    
+    $owners_directory = $hash_file. '.owners';
+    foreach (glob($owners_directory . '/*') as $owner) {
+        unlink($owner);
+    }
+    is_dir($owners_directory) && rmdir($owners_directory);
+    
+    return is_file($hash_file) && unlink($hash_file);
 }
