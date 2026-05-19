@@ -17,7 +17,8 @@ describe("OPTIONS /list/*", function() {
         $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!');
         list($protocol, $status, $headers, $body) = FeatureCase::request('OPTIONS', '/list/15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f');
         expect($status)->toBe('204');
-        expect($headers['access-control-allow-origin'])->toBe('Authorization, *');
+        expect($headers['access-control-allow-origin'])->toBe('*');
+        expect($headers['access-control-allow-headers'])->toBe('Authorization, *');
         expect(explode(', ', $headers['access-control-allow-methods']))->toContain('HEAD');
         expect(explode(', ', $headers['access-control-allow-methods']))->toContain('GET');
         expect($body)->toBeEmpty();

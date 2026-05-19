@@ -10,7 +10,8 @@ describe("OPTIONS /media", function() {
         $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!');
         list($protocol, $status, $headers, $body) = FeatureCase::request('OPTIONS', '/media');
         expect($status)->toBe('204');
-        expect($headers['access-control-allow-origin'])->toBe('Authorization, *');
+        expect($headers['access-control-allow-origin'])->toBe('*');
+        expect($headers['access-control-allow-headers'])->toBe('Authorization, *');
         expect(explode(', ', $headers['access-control-allow-methods']))->toContain('HEAD');
         expect(explode(', ', $headers['access-control-allow-methods']))->toContain('PUT');
         expect($body)->toBeEmpty();

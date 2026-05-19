@@ -10,7 +10,8 @@ describe("OPTIONS /<sha-256>", function() {
         $hash = \nostriphant\Blossom\writeFile(FeatureCase::$blossom->files_directory, 'Hello World!');
         list($protocol, $status, $headers, $body) = FeatureCase::request('OPTIONS', '/' . $hash);
         expect($status)->toBe('204');
-        expect($headers['access-control-allow-origin'])->toBe('Authorization, *');
+        expect($headers['access-control-allow-origin'])->toBe('*');
+        expect($headers['access-control-allow-headers'])->toBe('Authorization, *');
         expect(explode(', ', $headers['access-control-allow-methods']))->toContain('GET', 'HEAD');
         expect($body)->toBeEmpty();
         
@@ -21,7 +22,8 @@ describe("OPTIONS /<sha-256>", function() {
         $hash = \nostriphant\Blossom\writeFile(FeatureCase::$blossom->files_directory, 'Hello World!');
         list($protocol, $status, $headers, $body) = FeatureCase::request('OPTIONS', '/' . $hash . '.txt');
         expect($status)->toBe('204');
-        expect($headers['access-control-allow-origin'])->toBe('Authorization, *');
+        expect($headers['access-control-allow-origin'])->toBe('*');
+        expect($headers['access-control-allow-headers'])->toBe('Authorization, *');
         expect(explode(', ', $headers['access-control-allow-methods']))->toContain('GET', 'HEAD');
         expect($body)->toBeEmpty();
         

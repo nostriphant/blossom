@@ -12,7 +12,8 @@ readonly class Options {
         return [
             'status' => '204',
             'headers' => [
-                'Access-Control-Allow-Origin' => 'Authorization, *',
+                'Access-Control-Allow-Origin' => '*',
+                'Access-Control-Allow-Headers' => 'Authorization, *',
                 'Access-Control-Allow-Methods' => join(', ', $this->methods),
                 'Access-Control-Max-Age' => 86400
             ]
