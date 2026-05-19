@@ -27,7 +27,7 @@ abstract class FeatureCase extends BaseTestCase
         is_dir($data_directory) || mkdir($data_directory);
     
         $url = 'http://' . $socket;
-        $process = proc_open([PHP_BINARY, '-S', $socket, './tests/blossom.php'], $descriptorspec, $pipes, ROOT_DIR, [
+        $process = proc_open([PHP_BINARY, '-S', $socket, '-d', 'variables_order=EGPCS', './tests/blossom.php'], $descriptorspec, $pipes, ROOT_DIR, [
             'BLOSSOM_SERVER_URL' => $url,
             'BLOSSOM_DATA_DIRECTORY' => $data_directory,
             'BLOSSOM_ALLOWED_PUBKEYS' => '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f',

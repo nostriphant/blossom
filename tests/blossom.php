@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/bootstrap.php';
 
-$dotenv = Dotenv\Dotenv::createMutable(__DIR__);
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->safeLoad();
 
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) { 
