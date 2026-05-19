@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8a07caeb042cf80939e9f25da3ca5a72",
+    "content-hash": "3ea8fe13ef3de2326668189233d4e451",
     "packages": [
         {
             "name": "nostriphant/functional",
@@ -49,6 +49,56 @@
                 "source": "https://github.com/nostriphant/functional/tree/2.6.1"
             },
             "time": "2026-02-24T07:32:27+00:00"
+        },
+        {
+            "name": "nostriphant/http",
+            "version": "0.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nostriphant/http.git",
+                "reference": "e84f03e5b555ad0d2b1479e268a7640d7e66526f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nostriphant/http/zipball/e84f03e5b555ad0d2b1479e268a7640d7e66526f",
+                "reference": "e84f03e5b555ad0d2b1479e268a7640d7e66526f",
+                "shasum": ""
+            },
+            "require": {
+                "nostriphant/functional": "^2.3",
+                "nostriphant/nip-01": "^2.2",
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "nikic/fast-route": "^1.3",
+                "pestphp/pest": "^4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "functions.php"
+                ],
+                "psr-4": {
+                    "nostriphant\\HTTP\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Rik Meijer",
+                    "email": "nostriphant@rikmeijer.nl"
+                }
+            ],
+            "description": "http helper library",
+            "homepage": "https://github.com/nostriphant/http",
+            "support": {
+                "issues": "https://github.com/nostriphant/http/issues",
+                "source": "https://github.com/nostriphant/http/tree/0.1.1"
+            },
+            "time": "2026-05-19T10:09:37+00:00"
         },
         {
             "name": "nostriphant/nip-01",

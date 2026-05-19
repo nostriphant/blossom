@@ -9,7 +9,7 @@ abstract class FeatureCase extends BaseTestCase
     static mixed $blossom;
     
     static function request(string $method, string $path, $upload_resource = null, ?array $authorization = null, ?array $headers = []) : array {
-        return \nostriphant\Blossom\request($method, str_starts_with($path, 'http') ? $path : self::$blossom->url . $path, $upload_resource, $authorization, $headers);
+        return \nostriphant\HTTP\request($method, str_starts_with($path, 'http') ? $path : self::$blossom->url . $path, $upload_resource, $authorization, $headers);
     }
     
     static function start_blossom(string $socket, string $output, string $errors) {

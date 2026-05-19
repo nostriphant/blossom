@@ -7,7 +7,7 @@ class Authorization {
     public function __construct(private Endpoint\Action\Factory $action_factory) {
     }
     
-    public function __invoke(HTTP\ServerRequest $request) : array {
+    public function __invoke(\nostriphant\HTTP\ServerRequest $request) : array {
         $unauthorized = fn(int $status, string $reason) => ['status' => $status, 'headers' => ['x-reason' => $reason]];
         if (isset($request->authorization) === false) {
             return $unauthorized(401, 'No authorization found');

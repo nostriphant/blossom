@@ -8,7 +8,7 @@ class Factory {
         $this->translate_request = \Closure::fromCallable($translate_request);
     }
 
-    public function __invoke(\nostriphant\Blossom\HTTP\ServerRequest $request) : \nostriphant\Blossom\Endpoint\Action {
+    public function __invoke(\nostriphant\HTTP\ServerRequest $request) : \nostriphant\Blossom\Endpoint\Action {
         return new ($this->class)(...call_user_func($this->translate_request, $request));
     }
 }

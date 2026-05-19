@@ -36,15 +36,15 @@ readonly class Blossom implements \IteratorAggregate {
     public function getIterator(): \Traversable {
         $wrap = fn(string $endpoint_path, Endpoint $endpoint) => function(callable $define) use ($endpoint, $endpoint_path) : void {
             
-            $additional_headers = new HTTP\AdditionalHeaders;
-            $redefine = fn(string $method, callable $request_handler) => $define($method, $endpoint_path, fn(HTTP\ServerRequest $request) => $additional_headers($request_handler($request)));
+            $additional_headers = new \nostriphant\HTTP\AdditionalHeaders;
+            $redefine = fn(string $method, callable $request_handler) => $define($method, $endpoint_path, fn(\nostriphant\HTTP\ServerRequest $request) => $additional_headers($request_handler($request)));
             
             $endpoint_methods = [];
-            $endpoint(function(HTTP\Method $method, bool $authorized, Endpoint\Action\Factory $action_factory) use ($redefine, &$endpoint_methods) {
+            $endpoint(function(\nostriphant\HTTP\Method $method, bool $authorized, Endpoint\Action\Factory $action_factory) use ($redefine, &$endpoint_methods) {
                 if ($authorized) {
                     $redefine($method->name, new Authorization($action_factory));
                 } else {
-                    $redefine($method->name, function(HTTP\ServerRequest $request) use ($action_factory) {
+                    $redefine($method->name, function(\nostriphant\HTTP\ServerRequest $request) use ($action_factory) {
                         $action = $action_factory($request);
                         return $action(null, [], fn(callable $action) => $action(null), fn(int $status, string $reason) => ['status' => $status, 'headers' => ['x-reason' => $reason]]);
                     });
@@ -52,7 +52,7 @@ readonly class Blossom implements \IteratorAggregate {
                 $endpoint_methods[] = $method;
             });
 
-            $define('OPTIONS', $endpoint_path, fn(HTTP\ServerRequest $request) => (new Endpoint\Action\Options(...iterator_to_array($endpoint_methods)))());
+            $define('OPTIONS', $endpoint_path, fn(\nostriphant\HTTP\ServerRequest $request) => (new Endpoint\Action\Options(...iterator_to_array($endpoint_methods)))());
         };
         
         yield $wrap('/{hash:\w{64}}[.{ext:\w+}]', new Endpoint\Blob($this->factory));
