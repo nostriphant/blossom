@@ -28,7 +28,7 @@ describe("OPTIONS /mirror", function() {
 
 it('The /mirror endpoint MUST download the blob from the specified URL and verify that there is at least one x tag in the authorization event matching the sha256 hash of the download blob', function () {
 
-    $blossom = FeatureCase::start_blossom('127.0.0.1:8088', ROOT_DIR . "/logs/blossom-8088.log", ROOT_DIR . "/logs/blossom-errors-8088.log");
+    $blossom = FeatureCase::start_blossom('127.0.0.1:8088', "blossom-8088.log", "blossom-errors-8088.log");
     
     try {
         $contents = 'Hello Wddorld!!!###';

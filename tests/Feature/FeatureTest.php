@@ -3,7 +3,7 @@
 use \nostriphant\BlossomTests\FeatureCase;
 
 beforeAll(function() : void {
-    FeatureCase::$blossom = FeatureCase::start_blossom('127.0.0.1:8087', ROOT_DIR . "/logs/blossom-errors-8087.log", ROOT_DIR . "/logs/blossom-errors-8087.log");
+    FeatureCase::$blossom = FeatureCase::start_blossom('127.0.0.1:8087', "blossom-errors-8087.log", "blossom-errors-8087.log");
     define('FILES_DIRECTORY', FeatureCase::$blossom->files_directory);
 });
 

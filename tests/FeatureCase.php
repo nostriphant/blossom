@@ -13,10 +13,13 @@ abstract class FeatureCase extends BaseTestCase
     }
     
     static function start_blossom(string $socket, string $output, string $errors) {
+        $logs_directory = ROOT_DIR . "/logs";
+        is_dir($logs_directory) || mkdir($logs_directory);
+        
         $descriptorspec = [
             0 => ["pipe", "r"],  
-            1 => ["file", $output, "w"], 
-            2 => ["file", $errors, "w"]
+            1 => ["file", $logs_directory . DIRECTORY_SEPARATOR . $output, "w"], 
+            2 => ["file", $logs_directory . DIRECTORY_SEPARATOR . $errors, "w"]
         ];
         
         list($host, $port) = explode(':', $socket, 2);
