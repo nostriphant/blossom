@@ -21,7 +21,7 @@ function destroy_directories(string $path) {
         } elseif (is_file($subpath)) {
             unlink($subpath);
         } else {
-            destroy_directorys($subpath);
+            destroy_directories($subpath);
         }
     }
     return rmdir($path);
