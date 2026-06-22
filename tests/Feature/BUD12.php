@@ -8,26 +8,26 @@ use \nostriphant\BlossomTests\FeatureCase;
 describe("OPTIONS /list/*", function() {
     it('OPTIONS on /list returns a 400 status code', function () {
         $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!');
-        list($protocol, $status, $headers, $body) = FeatureCase::request('OPTIONS', '/list');
-        expect($status)->toBe('404');
-        expect($body)->toBeEmpty();
+        $response = FeatureCase::request('OPTIONS', '/list');
+        expect($response->status)->toBe('404');
+        expect($response->body)->toBeEmpty();
     });
     
     it('For preflight (OPTIONS) requests, servers MUST also set, at minimum, the Access-Control-Allow-Headers: Authorization, * and Access-Control-Allow-Methods: GET headers.', function () {
         $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!');
-        list($protocol, $status, $headers, $body) = FeatureCase::request('OPTIONS', '/list/15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f');
-        expect($status)->toBe('204');
-        expect($headers['access-control-allow-origin'])->toBe('*');
-        expect($headers['access-control-allow-headers'])->toBe('Authorization, *');
-        expect(explode(', ', $headers['access-control-allow-methods']))->toContain('HEAD');
-        expect(explode(', ', $headers['access-control-allow-methods']))->toContain('GET');
-        expect($body)->toBeEmpty();
+        $response = FeatureCase::request('OPTIONS', '/list/15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f');
+        expect($response->status)->toBe('204');
+        expect($response->headers['access-control-allow-origin'])->toBe('*');
+        expect($response->headers['access-control-allow-headers'])->toBe('Authorization, *');
+        expect(explode(', ', $response->headers['access-control-allow-methods']))->toContain('HEAD');
+        expect(explode(', ', $response->headers['access-control-allow-methods']))->toContain('GET');
+        expect($response->body)->toBeEmpty();
     });
 
     it('The header Access-Control-Max-Age: 86400 MAY be set to cache the results of a preflight request for 24 hours.', function () {
         $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!');
-        list($protocol, $status, $headers, $body) = FeatureCase::request('OPTIONS', '/list/15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f');
-        expect($headers['access-control-max-age'])->toBe('86400');
+        $response = FeatureCase::request('OPTIONS', '/list/15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f');
+        expect($response->headers['access-control-max-age'])->toBe('86400');
     });
 });
 
@@ -49,25 +49,25 @@ it('The GET /list/15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb
     sort($files);
     
     
-    list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/list/15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f');
-    expect($status)->toBe('200');
+    $response = FeatureCase::request('GET', '/list/15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f');
+    expect($response->status)->toBe('200');
     
-    $blob_descriptors = json_decode($body);
+    $blob_descriptors = json_decode($response->body);
     expect($blob_descriptors)->toHaveCount(count($files));
     
     
-    list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/list/15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f?limit=50');
-    expect($status)->toBe('200');
+    $response = FeatureCase::request('GET', '/list/15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f?limit=50');
+    expect($response->status)->toBe('200');
     
-    $blob_descriptors = json_decode($body);
+    $blob_descriptors = json_decode($response->body);
     expect($blob_descriptors)->toHaveCount(50);
     
     $cursor = basename($files[9]);
     
-    list($protocol, $status, $headers, $body) = FeatureCase::request('GET', '/list/15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f?limit=50&cursor=' . $cursor);
-    expect($status)->toBe('200');
+    $response = FeatureCase::request('GET', '/list/15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f?limit=50&cursor=' . $cursor);
+    expect($response->status)->toBe('200');
     
-    $blob_descriptors = json_decode($body);
+    $blob_descriptors = json_decode($response->body);
     expect($blob_descriptors)->toHaveCount(50);
     
     foreach (array_slice($files, 10, 50) as $i => $expected_file) {

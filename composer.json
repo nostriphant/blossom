@@ -5,9 +5,9 @@
     "require": {
         "php": "^8.4",
         "ext-fileinfo": "*",
-        "nostriphant/functional": "^2.3",
-        "nostriphant/nip-01": "^2.2",
-        "nostriphant/http": "^0.1.1"
+        "nostriphant/functional": "^2.7",
+        "nostriphant/nip-01": "^3.0",
+        "nostriphant/http": "^0.4.0"
     },
     
     "license": "MIT",

@@ -8,8 +8,11 @@ abstract class FeatureCase extends BaseTestCase
 {   
     static mixed $blossom;
     
-    static function request(string $method, string $path, $upload_resource = null, ?array $authorization = null, ?array $headers = []) : array {
-        return \nostriphant\HTTP\request($method, str_starts_with($path, 'http') ? $path : self::$blossom->url . $path, $upload_resource, $authorization, $headers);
+    static function request(string $method, string $path, $upload_resource = null, ?array $authorization = null, ?array $headers = []) : \nostriphant\HTTP\ServerResponse {
+        $authorization['key'] ??= 'a71a415936f2dd70b777e5204c57e0df9a6dffef91b3c78c1aa24e54772e33c3';
+        $authorization['pubkey'] ?? \nostriphant\NIP01\Key::derivePublicKey(\nostriphant\NIP01\Key::fromHex($authorization['key']));
+        
+        return \nostriphant\HTTP\request($method, str_starts_with($path, 'http') ? $path : self::$blossom->url . $path, $upload_resource, ['nostr', $authorization], $headers);
     }
     
     static function start_blossom(string $socket, string $output, string $errors) {

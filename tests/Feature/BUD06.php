@@ -15,8 +15,8 @@ it('The HEAD /upload endpoint MUST use the X-SHA-256, X-Content-Type and X-Conte
     
     $hash_file = FILES_DIRECTORY . DIRECTORY_SEPARATOR . $hash;
     
-    list($protocol, $status, $headers, $body) = FeatureCase::request('HEAD', '/upload', upload_resource: tmpfile(), authorization:['t' => 'upload', 'x' => $hash, 'key' => '6eeb5ad99e47115467d096e07c1c9b8b41768ab53465703f78017204adc5b0cc']);
-    expect($status)->toBe('400');
+    $response = FeatureCase::request('HEAD', '/upload', upload_resource: tmpfile(), authorization:['t' => 'upload', 'x' => $hash, 'key' => '6eeb5ad99e47115467d096e07c1c9b8b41768ab53465703f78017204adc5b0cc']);
+    expect($response->status)->toBe('400');
 });
 
 it('The HEAD /upload endpoint MUST use headers sent by client', function (string $contents, ?string $hash, ?int $content_length, ?string $content_type, string $response_status, ?string $x_reason = null) {
@@ -34,16 +34,16 @@ it('The HEAD /upload endpoint MUST use headers sent by client', function (string
     expect($hash_file . '.owners')->not()->toBeDirectory();
     expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
     
-    list($protocol, $status, $headers, $body) = FeatureCase::request('HEAD', '/upload', upload_resource: $resource, authorization:['t' => 'upload', 'x' => $hash], headers: [
+    $response = FeatureCase::request('HEAD', '/upload', upload_resource: $resource, authorization:['t' => 'upload', 'x' => $hash], headers: [
         'X-Content-Type: ' . $content_type,
         'X-Content-Length: ' . $content_length,
         'X-SHA-256: ' . $hash
     ]);
-    expect($status)->toBe($response_status, $headers['x-reason'] ?? 'no reason');
+    expect($response->status)->toBe($response_status, $response->headers['x-reason'] ?? 'no reason');
     if (isset($x_reason)) {
-        expect($headers['x-reason'])->toBe($x_reason);
+        expect($response->headers['x-reason'])->toBe($x_reason);
     } else {
-        expect($headers)->not()->toHaveKey('x-reason');
+        expect($response->headers)->not()->toHaveKey('x-reason');
     }
 })->with([
     ['Heldlo World!!!', null, null, null, '200'],

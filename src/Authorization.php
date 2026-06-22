@@ -36,7 +36,7 @@ class Authorization {
     }
     
     static function makeEvent(\nostriphant\NIP01\Key $key, string $action, string $hash, string $description) : \nostriphant\NIP01\Event {
-        $mirror_authorization_rumor = new \nostriphant\NIP01\Rumor(time(), $key(\nostriphant\NIP01\Key::public()), 24242,  $description, [
+        $mirror_authorization_rumor = new \nostriphant\NIP01\Rumor(time(), 24242,  $description, [
             ['t', $action],
             ["expiration", time() + 3600],
             ['x', $hash]

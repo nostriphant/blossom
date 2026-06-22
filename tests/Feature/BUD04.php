@@ -8,20 +8,20 @@ use \nostriphant\BlossomTests\FeatureCase;
 describe("OPTIONS /mirror", function() {
     it('For preflight (OPTIONS) requests, servers MUST also set, at minimum, the Access-Control-Allow-Headers: Authorization, * and Access-Control-Allow-Methods: PUT headers.', function () {
         $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!##');
-        list($protocol, $status, $headers, $body) = FeatureCase::request('OPTIONS', '/upload');
-        expect($status)->toBe('204');
-        expect($headers['access-control-allow-origin'])->toBe('*');
-        expect($headers['access-control-allow-headers'])->toBe('Authorization, *');
-        expect(explode(', ', $headers['access-control-allow-methods']))->toContain('PUT');
-        expect($body)->toBeEmpty();
+        $response = FeatureCase::request('OPTIONS', '/upload');
+        expect($response->status)->toBe('204');
+        expect($response->headers['access-control-allow-origin'])->toBe('*');
+        expect($response->headers['access-control-allow-headers'])->toBe('Authorization, *');
+        expect(explode(', ', $response->headers['access-control-allow-methods']))->toContain('PUT');
+        expect($response->body)->toBeEmpty();
         
         \nostriphant\Blossom\deleteFile(FILES_DIRECTORY, $hash);
     });
 
     it('The header Access-Control-Max-Age: 86400 MAY be set to cache the results of a preflight request for 24 hours.', function () {
         $hash = \nostriphant\Blossom\writeFile(FILES_DIRECTORY, 'Hello World!##');
-        list($protocol, $status, $headers, $body) = FeatureCase::request('OPTIONS', '/upload');
-        expect($headers['access-control-max-age'])->toBe('86400');
+        $response = FeatureCase::request('OPTIONS', '/upload');
+        expect($response->headers['access-control-max-age'])->toBe('86400');
         \nostriphant\Blossom\deleteFile(FILES_DIRECTORY, $hash);
     });
 });
@@ -40,10 +40,10 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         $expected_hash = hash('sha256', $contents);
         $hash_file = $blossom->files_directory . DIRECTORY_SEPARATOR . $expected_hash;
 
-        list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', '/upload', upload_resource: $resource, authorization:['t' => 'upload', 'x' => $expected_hash]);
-        expect($status)->toBe('201');
+        $response = FeatureCase::request('PUT', '/upload', upload_resource: $resource, authorization:['t' => 'upload', 'x' => $expected_hash]);
+        expect($response->status)->toBe('201');
 
-        $blob_descriptor = json_decode($body);
+        $blob_descriptor = json_decode($response->body);
         expect($blob_descriptor->url)->toBe(FeatureCase::$blossom->url . '/' . $expected_hash);
         expect($blob_descriptor->sha256)->toBe($expected_hash);
         expect($blob_descriptor->size)->toBe(strlen($contents), $expected_hash);
@@ -51,10 +51,10 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         expect($blob_descriptor->uploaded)->toBeInt();
 
         $mirror_content = '{"url": "'.$blob_descriptor->url.'.txt"}';
-        list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', $blossom->url . '/mirror', upload_resource: $mirror_content, authorization:['t' => 'upload', 'x' => $expected_hash]);
-        expect($status)->toBe('201', $headers['x-reason'] ?? '');
+        $response = FeatureCase::request('PUT', $blossom->url . '/mirror', upload_resource: $mirror_content, authorization:['t' => 'upload', 'x' => $expected_hash]);
+        expect($response->status)->toBe('201', $response->headers['x-reason'] ?? '');
         
-        $blob_descriptor = json_decode($body);
+        $blob_descriptor = json_decode($response->body);
         expect($blob_descriptor->url)->toBe(FeatureCase::$blossom->url . '/' . $expected_hash.'.txt');
         expect($blob_descriptor->sha256)->toBe($expected_hash);
         expect($blob_descriptor->size)->toBe(strlen($contents), $expected_hash);
@@ -62,21 +62,21 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         expect($blob_descriptor->uploaded)->toBeInt();
 
 
-        expect($headers['content-location'])->toBe('/' . $expected_hash);
-        expect((int)$headers['content-length'])->toBe(strlen($body));
-        expect($headers['access-control-allow-origin'])->toBe('*');
+        expect($response->headers['content-location'])->toBe('/' . $expected_hash);
+        expect((int)$response->headers['content-length'])->toBe(strlen($response->body));
+        expect($response->headers['access-control-allow-origin'])->toBe('*');
 
         expect($hash_file)->toBeFile();
         expect($hash_file . '.owners')->toBeDirectory();
         expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->toBeFile();
 
-        list($protocol, $status, $headers, $body) = FeatureCase::request('DELETE', $blossom->url . '/' . $blob_descriptor->sha256, authorization:['t' => 'delete', 'x' => $expected_hash]);
-        expect($status)->toBe('204');
-        expect($headers['access-control-allow-origin'])->toBe('*');
+        $response = FeatureCase::request('DELETE', $blossom->url . '/' . $blob_descriptor->sha256, authorization:['t' => 'delete', 'x' => $expected_hash]);
+        expect($response->status)->toBe('204');
+        expect($response->headers['access-control-allow-origin'])->toBe('*');
         
         
-        list($protocol, $status, $headers, $body) = FeatureCase::request('DELETE', '/' . $blob_descriptor->sha256, authorization:['t' => 'delete', 'x' => $expected_hash]);
-        expect($status)->toBe('204');
+        $response = FeatureCase::request('DELETE', '/' . $blob_descriptor->sha256, authorization:['t' => 'delete', 'x' => $expected_hash]);
+        expect($response->status)->toBe('204');
 
         clearstatcache();
         expect($hash_file)->not()->toBeFile();
@@ -95,10 +95,10 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         $expected_hash = hash('sha256', $contents);
         $hash_file = $blossom->files_directory . DIRECTORY_SEPARATOR . $expected_hash;
 
-        list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', $blossom->url . '/upload', upload_resource: $resource, authorization:['t' => 'upload', 'x' => $expected_hash]);
-        expect($status)->toBe('201');
+        $response = FeatureCase::request('PUT', $blossom->url . '/upload', upload_resource: $resource, authorization:['t' => 'upload', 'x' => $expected_hash]);
+        expect($response->status)->toBe('201');
 
-        $blob_descriptor = json_decode($body);
+        $blob_descriptor = json_decode($response->body);
         expect($blob_descriptor->url)->toBe($blossom->url . '/' . $expected_hash);
         expect($blob_descriptor->sha256)->toBe($expected_hash);
         expect($blob_descriptor->size)->toBe(strlen($contents), $expected_hash);
@@ -106,10 +106,10 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         expect($blob_descriptor->uploaded)->toBeInt();
 
         $mirror_content = '{"url": "'.$blob_descriptor->url.'"}';
-        list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', '/mirror', upload_resource: $mirror_content, authorization:['t' => 'upload', 'x' => $expected_hash]);
-        expect($status)->toBe('201', $headers['x-reason'] ?? '');
+        $response = FeatureCase::request('PUT', '/mirror', upload_resource: $mirror_content, authorization:['t' => 'upload', 'x' => $expected_hash]);
+        expect($response->status)->toBe('201', $response->headers['x-reason'] ?? '');
         
-        $blob_descriptor = json_decode($body);
+        $blob_descriptor = json_decode($response->body);
         expect($blob_descriptor->url)->toBe($blossom->url . '/' . $expected_hash);
         expect($blob_descriptor->sha256)->toBe($expected_hash);
         expect($blob_descriptor->size)->toBe(strlen($contents), $expected_hash);
@@ -117,22 +117,22 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         expect($blob_descriptor->uploaded)->toBeInt();
 
 
-        expect($headers['content-location'])->toBe('/' . $expected_hash);
-        expect((int)$headers['content-length'])->toBe(strlen($body));
-        expect($headers['access-control-allow-origin'])->toBe('*');
+        expect($response->headers['content-location'])->toBe('/' . $expected_hash);
+        expect((int)$response->headers['content-length'])->toBe(strlen($response->body));
+        expect($response->headers['access-control-allow-origin'])->toBe('*');
 
         expect($hash_file)->toBeFile();
         expect($hash_file . '.owners')->toBeDirectory();
         expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->toBeFile();
         
         
-        list($protocol, $status, $headers, $body) = FeatureCase::request('DELETE', '/' . $blob_descriptor->sha256, authorization:['t' => 'delete', 'x' => $expected_hash]);
-        expect($status)->toBe('204');
+        $response = FeatureCase::request('DELETE', '/' . $blob_descriptor->sha256, authorization:['t' => 'delete', 'x' => $expected_hash]);
+        expect($response->status)->toBe('204');
 
 
-        list($protocol, $status, $headers, $body) = FeatureCase::request('DELETE', $blossom->url . '/' . $blob_descriptor->sha256, authorization:['t' => 'delete', 'x' => $expected_hash]);
-        expect($status)->toBe('204');
-        expect($headers['access-control-allow-origin'])->toBe('*');
+        $response = FeatureCase::request('DELETE', $blossom->url . '/' . $blob_descriptor->sha256, authorization:['t' => 'delete', 'x' => $expected_hash]);
+        expect($response->status)->toBe('204');
+        expect($response->headers['access-control-allow-origin'])->toBe('*');
 
         clearstatcache();
         expect($hash_file)->not()->toBeFile();
@@ -152,9 +152,9 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         touch($hash_original_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f');
 
         $mirror_content = '{"url": "'.FeatureCase::$blossom->url . '/' . $hash.'"}';
-        list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', $blossom->url . '/mirror', upload_resource: $mirror_content, authorization:['t' => 'upload', 'x' => $hash]);
-        expect($status)->toBe('413', $body);
-        expect($headers['x-reason'])->toBe('Filesize larger than max allowed file size.');
+        $response = FeatureCase::request('PUT', $blossom->url . '/mirror', upload_resource: $mirror_content, authorization:['t' => 'upload', 'x' => $hash]);
+        expect($response->status)->toBe('413', $response->body);
+        expect($response->headers['x-reason'])->toBe('Filesize larger than max allowed file size.');
 
         \nostriphant\Blossom\deleteFile($blossom->files_directory, $hash);
         
@@ -177,9 +177,9 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
         touch($hash_original_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f');
 
         $mirror_content = '{"url": "'.FeatureCase::$blossom->url . '/' . $hash.'"}';
-        list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', $blossom->url . '/mirror', upload_resource: $mirror_content, authorization:['t' => 'upload', 'x' => $expected_hash]);
-        expect($status)->toBe('403', $body);
-        expect($headers['x-reason'])->toBe('Authorized hash (' . $expected_hash . ')  does not match hash of contents (29f662e3fded284e2695546ef01ede7d4d01f9d28b706d41b65b99ad600154d3).');
+        $response = FeatureCase::request('PUT', $blossom->url . '/mirror', upload_resource: $mirror_content, authorization:['t' => 'upload', 'x' => $expected_hash]);
+        expect($response->status)->toBe('403', $response->body);
+        expect($response->headers['x-reason'])->toBe('Authorized hash (' . $expected_hash . ')  does not match hash of contents (29f662e3fded284e2695546ef01ede7d4d01f9d28b706d41b65b99ad600154d3).');
 
         \nostriphant\Blossom\deleteFile(FILES_DIRECTORY, $hash);
         
@@ -214,12 +214,12 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
 //    expect($hash_file . '.owners')->not()->toBeDirectory();
 //    expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
 //    
-//    list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', '/upload', upload_resource: $resource, authorization:['t' => 'upload', 'x' => $hash], headers:[
+//    $response = FeatureCase::request('PUT', '/upload', upload_resource: $resource, authorization:['t' => 'upload', 'x' => $hash], headers:[
 //        'Content-Type: text/plain',
 //        'Content-Length: ' . strlen($contents)
 //    ]);
-//    expect($status)->toBe('413');
-//    expect($headers['x-reason'])->toBe('File too large. Max allowed size is 100 bytes.');
+//    expect($response->status)->toBe('413');
+//    expect($response->headers['x-reason'])->toBe('File too large. Max allowed size is 100 bytes.');
 //
 //    expect($hash_file)->not()->toBeFile();
 //    expect($hash_file . '.owners')->not()->toBeDirectory();
@@ -242,12 +242,12 @@ it('The /mirror endpoint MUST download the blob from the specified URL and verif
 //    expect($hash_file . '.owners' . DIRECTORY_SEPARATOR . '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f')->not()->toBeFile();
 //    
 //    
-//    list($protocol, $status, $headers, $body) = FeatureCase::request('PUT', '/upload', upload_resource: $resource, authorization:['t' => 'upload', 'x' => $hash], headers:[
+//    $response = FeatureCase::request('PUT', '/upload', upload_resource: $resource, authorization:['t' => 'upload', 'x' => $hash], headers:[
 //        'Content-Type: audio/wav',
 //        'Content-Length: ' . strlen($contents)
 //    ]);
-//    expect($status)->toBe('415');
-//    expect($headers['x-reason'])->toBe('Unsupported file type.');
+//    expect($response->status)->toBe('415');
+//    expect($response->headers['x-reason'])->toBe('Unsupported file type.');
 //
 //    expect($hash_file)->not()->toBeFile();
 //    expect($hash_file . '.owners')->not()->toBeDirectory();
