@@ -19,35 +19,31 @@ abstract class FeatureCase extends BaseTestCase
         $logs_directory = ROOT_DIR . "/logs";
         is_dir($logs_directory) || mkdir($logs_directory);
         
-        $descriptorspec = [
-            0 => ["pipe", "r"],  
-            1 => ["file", $logs_directory . DIRECTORY_SEPARATOR . $output, "w"], 
-            2 => ["file", $logs_directory . DIRECTORY_SEPARATOR . $errors, "w"]
-        ];
-        
         list($host, $port) = explode(':', $socket, 2);
         $data_directory = \nostriphant\Blossom\data_directory() . '-' . $port;
         is_dir($data_directory) || mkdir($data_directory);
     
         $url = 'http://' . $socket;
-        $process = proc_open([PHP_BINARY, '-S', $socket, '-d', 'variables_order=EGPCS', './tests/blossom.php'], $descriptorspec, $pipes, ROOT_DIR, [
+        
+        $io = new \nostriphant\Functional\IO(
+                fopen('php://temp', 'r'),
+                fopen($logs_directory . DIRECTORY_SEPARATOR . $output, "w"),
+                fopen($logs_directory . DIRECTORY_SEPARATOR . $errors, "w")
+        );
+        $process = new \nostriphant\Functional\IO\Process($io, ROOT_DIR, [
             'BLOSSOM_SERVER_URL' => $url,
             'BLOSSOM_DATA_DIRECTORY' => $data_directory,
             'BLOSSOM_ALLOWED_PUBKEYS' => '15b7c080c36d1823acc5b27b155edbf35558ef15665a6e003144700fc8efdb4f',
             'MAX_CONTENT_LENGTH' => 100
         ]);
-
-        fclose($pipes[0]);
         
-        return new class($data_directory . DIRECTORY_SEPARATOR . 'files', $url, $process) {
-            
+        return new class($data_directory . DIRECTORY_SEPARATOR . 'files', $url, $process(PHP_BINARY, '-S', $socket, '-d', 'variables_order=EGPCS', './tests/blossom.php')) {
             public function __construct(public string $files_directory, public string $url, private $process) {
             
             }
             
             public function __invoke() {
-                proc_terminate($this->process);
-                proc_close($this->process);
+                call_user_func($this->process);
                 
                 \nostriphant\Blossom\destroy_directories($this->files_directory);
                 is_dir($this->files_directory) && rmdir($this->files_directory);

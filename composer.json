@@ -7,9 +7,8 @@
         "ext-fileinfo": "*",
         "nostriphant/functional": "^2.7",
         "nostriphant/nip-01": "^3.0",
-        "nostriphant/http": "^0.4.0"
+        "nostriphant/http": "^0.4"
     },
-    
     "license": "MIT",
     "autoload": {
         "psr-4": {

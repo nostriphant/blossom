@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c804527e6048c837658f2984d254f01e",
+    "content-hash": "7bc8faf3851686e790652141943afdf1",
     "packages": [
         {
             "name": "nostriphant/functional",
-            "version": "2.7.1",
+            "version": "2.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/functional.git",
-                "reference": "8e90d6c5e0f5d9e4d3e679bf60975edc8994a573"
+                "reference": "b6f82f91ff475cbb87267d52ba85072496f6784d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/functional/zipball/8e90d6c5e0f5d9e4d3e679bf60975edc8994a573",
-                "reference": "8e90d6c5e0f5d9e4d3e679bf60975edc8994a573",
+                "url": "https://api.github.com/repos/nostriphant/functional/zipball/b6f82f91ff475cbb87267d52ba85072496f6784d",
+                "reference": "b6f82f91ff475cbb87267d52ba85072496f6784d",
                 "shasum": ""
             },
             "require": {
@@ -46,22 +46,22 @@
             "description": "Functional helper classes for nostriphant projects",
             "support": {
                 "issues": "https://github.com/nostriphant/functional/issues",
-                "source": "https://github.com/nostriphant/functional/tree/2.7.1"
+                "source": "https://github.com/nostriphant/functional/tree/2.7.2"
             },
-            "time": "2026-06-19T13:32:01+00:00"
+            "time": "2026-06-22T08:22:07+00:00"
         },
         {
             "name": "nostriphant/http",
-            "version": "0.4.0",
+            "version": "0.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/http.git",
-                "reference": "7195be1ba79b673ba1ef2bf18bc54ca00a1c9c9c"
+                "reference": "fbbca11be08656c26ee5da025c110cdc7352574b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/http/zipball/7195be1ba79b673ba1ef2bf18bc54ca00a1c9c9c",
-                "reference": "7195be1ba79b673ba1ef2bf18bc54ca00a1c9c9c",
+                "url": "https://api.github.com/repos/nostriphant/http/zipball/fbbca11be08656c26ee5da025c110cdc7352574b",
+                "reference": "fbbca11be08656c26ee5da025c110cdc7352574b",
                 "shasum": ""
             },
             "require": {
@@ -96,9 +96,9 @@
             "homepage": "https://github.com/nostriphant/http",
             "support": {
                 "issues": "https://github.com/nostriphant/http/issues",
-                "source": "https://github.com/nostriphant/http/tree/0.4.0"
+                "source": "https://github.com/nostriphant/http/tree/0.4.1"
             },
-            "time": "2026-06-22T06:49:34+00:00"
+            "time": "2026-06-22T07:45:00+00:00"
         },
         {
             "name": "nostriphant/nip-01",
